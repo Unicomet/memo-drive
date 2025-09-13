@@ -21,16 +21,16 @@ export const mockFolders: Folder[] = [
     id: 1,
     name: "Music",
     modified: "1 day ago",
-    parent: 0,
+    parent: 1,
   },
   {
     id: 2,
     name: "Personal",
     modified: "2 days ago",
-    parent: 0,
+    parent: 1,
   },
   {
-    id: 0,
+    id: 1,
     name: "root",
     modified: "N/A",
   },
@@ -50,7 +50,7 @@ export const mockFiles: File[] = [
     size: 1200,
     url: "/files/documents.pdf",
     modified: "2 days ago",
-    parent: 0,
+    parent: 1,
   },
   {
     id: 2,
@@ -59,7 +59,7 @@ export const mockFiles: File[] = [
     size: 3400,
     url: "/files/photos.zip",
     modified: "5 days ago",
-    parent: 0,
+    parent: 1,
   },
   {
     id: 3,
@@ -95,7 +95,7 @@ export const mockFiles: File[] = [
     size: 200,
     url: "/files/resume.pdf",
     modified: "6 months ago",
-    parent: 0,
+    parent: 1,
   },
   {
     id: 7,
