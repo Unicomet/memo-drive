@@ -16,5 +16,3 @@
    ```
    pnpm dev
    ```
-   //
-   Fixing handleFolderClick and breadcrumbs
