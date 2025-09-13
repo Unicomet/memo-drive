@@ -13,7 +13,7 @@ export type Folder = {
   id: number;
   name: string;
   modified: string;
-  parent: number | null;
+  parent?: number;
 };
 
 export const mockFolders: Folder[] = [

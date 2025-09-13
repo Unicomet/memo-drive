@@ -11,12 +11,7 @@ export default function SandboxPage() {
         action={async () => {
           "use server";
 
-          const folderInsertions = await db.insert(folders).values(
-            mockFolders.map((folder) => ({
-              ...folder,
-              parent: folder.parent ?? 0,
-            })),
-          );
+          const folderInsertions = await db.insert(folders).values(mockFolders);
           const filesInsertion = await db.insert(files).values(mockFiles);
 
           console.log(folderInsertions);

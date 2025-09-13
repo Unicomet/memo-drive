@@ -1,3 +1,5 @@
+import "server-only";
+
 import {
   bigint,
   text,
@@ -20,7 +22,7 @@ export const files = createTable(
     fileType: text("file_type").notNull(),
     size: bigint("size", { mode: "number", unsigned: true }).notNull(),
     url: text("url").notNull(),
-    parent: bigint("parent", { mode: "number", unsigned: true }),
+    parent: bigint("parent", { mode: "number", unsigned: true }).notNull(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
     createdAt: timestamp("created_at").notNull().defaultNow(),
   },
@@ -36,7 +38,7 @@ export const folders = createTable(
       .primaryKey()
       .autoincrement(),
     name: text("name").notNull(),
-    parent: bigint("parent", { mode: "number", unsigned: true }).notNull(),
+    parent: bigint("parent", { mode: "number", unsigned: true }),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
     createdAt: timestamp("created_at").notNull().defaultNow(),
   },
