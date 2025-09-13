@@ -9,7 +9,7 @@ import { mockFiles, mockFolders, type Folder } from "~/lib/mock-data";
 import { FileRow, FolderRow } from "./file-row";
 
 export default function GoogleDriveClone() {
-  const [currentFolderId, setCurrentFolder] = useState<string>("root");
+  const [currentFolderId, setCurrentFolder] = useState<number>(0);
 
   const getCurrentFiles = () => {
     return mockFiles.filter((file) => file.parent === currentFolderId);
@@ -54,7 +54,7 @@ export default function GoogleDriveClone() {
     let currentFolder = mockFolders.find(
       (folder) => folder.id === currentFolderId,
     );
-    while (currentFolder && currentFolder?.id !== "root") {
+    while (currentFolder && currentFolder?.id !== 0) {
       breadCrumbs.unshift(currentFolder);
       currentFolder = mockFolders.find(
         (folder) => folder.id === currentFolder?.parent,
@@ -119,7 +119,7 @@ export default function GoogleDriveClone() {
         </div>
         <nav className="border-border mt-6 flex items-center space-x-3 border-t pt-6 text-sm">
           <Button
-            onClick={() => setCurrentFolder("root")}
+            onClick={() => setCurrentFolder(0)}
             variant="ghost"
             className="mr-2 cursor-pointer font-medium hover:text-white"
           >

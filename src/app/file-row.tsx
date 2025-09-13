@@ -54,7 +54,7 @@ export function FileRow(props: { file: File }) {
         <span className="w-28 text-right font-medium">{file.modified}</span>
         {file.size && (
           <span className="bg-muted w-24 rounded-md px-2 py-1 text-right font-mono text-xs">
-            {file.size}
+            {file.size} KB
           </span>
         )}
       </div>
