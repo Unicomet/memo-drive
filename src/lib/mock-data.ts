@@ -18,7 +18,7 @@ export type Folder = {
 
 export const mockFolders: Folder[] = [
   {
-    id: 1,
+    id: 4,
     name: "Music",
     modified: "1 day ago",
     parent: 1,
@@ -77,7 +77,7 @@ export const mockFiles: File[] = [
     size: 50,
     url: "/files/music.zip",
     modified: "3 weeks ago",
-    parent: 1,
+    parent: 4,
   },
   {
     id: 5,
