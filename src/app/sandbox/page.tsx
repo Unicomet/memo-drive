@@ -17,7 +17,6 @@ export default function SandboxPage() {
           console.log(folderInsertions);
           console.log(filesInsertion);
         }}
-        method="post"
       >
         <button
           type="submit"

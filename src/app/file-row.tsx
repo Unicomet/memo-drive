@@ -1,4 +1,3 @@
-import type { File, Folder } from "~/lib/mock-data";
 import {
   FileText,
   ImageIcon,
@@ -8,8 +7,10 @@ import {
   FolderIcon,
 } from "lucide-react";
 import { cn } from "~/lib/utils";
+import type { files } from "~/server/db/schema";
+import { type folders } from "../server/db/schema";
 
-const getFileIcon = (item: File) => {
+const getFileIcon = (item: typeof files.$inferSelect) => {
   switch (item.fileType) {
     case "document":
       return FileText;
@@ -26,7 +27,7 @@ const getFileIcon = (item: File) => {
   }
 };
 
-export function FileRow(props: { file: File }) {
+export function FileRow(props: { file: typeof files.$inferSelect }) {
   const { file } = props;
 
   const IconComponent = getFileIcon(file);
@@ -51,7 +52,9 @@ export function FileRow(props: { file: File }) {
         </div>
       </a>
       <div className="text-muted-foreground flex items-center space-x-8 text-sm">
-        <span className="w-28 text-right font-medium">{file.modified}</span>
+        <span className="w-28 text-right font-medium">
+          {JSON.stringify(file.updatedAt)}
+        </span>
         {file.size && (
           <span className="bg-muted w-24 rounded-md px-2 py-1 text-right font-mono text-xs">
             {file.size} KB
@@ -63,7 +66,7 @@ export function FileRow(props: { file: File }) {
 }
 
 export function FolderRow(props: {
-  folder: Folder;
+  folder: typeof folders.$inferSelect;
   handleFolderClick: () => void;
 }) {
   const { folder, handleFolderClick } = props;
@@ -88,7 +91,9 @@ export function FolderRow(props: {
         </p>
       </div>
       <div className="text-muted-foreground flex items-center space-x-8 text-sm">
-        <span className="w-28 text-right font-medium">{folder.modified}</span>
+        <span className="w-28 text-right font-medium">
+          {JSON.stringify(folder.updatedAt)}
+        </span>
         <span className="bg-muted w-24 rounded-md px-2 py-1 text-right font-mono text-xs">
           Folder
         </span>
