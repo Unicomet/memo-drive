@@ -33,7 +33,7 @@ export function FileRow(props: { file: File }) {
   return (
     <div
       key={file.id}
-      className="group hover:bg-card hover:border-border flex cursor-pointer items-center rounded-xl border border-transparent p-5 transition-all duration-200 hover:shadow-sm"
+      className="group hover:bg-card flex cursor-pointer items-center rounded-xl border-b p-5 transition-all duration-200 hover:shadow-sm"
     >
       <a href={file.url} target="_blank" className="flex flex-1">
         <div className="mr-5 flex-shrink-0">
@@ -71,7 +71,7 @@ export function FolderRow(props: {
   return (
     <div
       key={folder.id}
-      className="group hover:bg-card hover:border-border flex cursor-pointer items-center rounded-xl border border-transparent p-5 transition-all duration-200 hover:shadow-sm"
+      className="group hover:bg-card flex cursor-pointer items-center rounded-xl border p-5 transition-all duration-200 hover:shadow-sm"
       onClick={() => handleFolderClick()}
     >
       <div className="mr-5 flex-shrink-0">

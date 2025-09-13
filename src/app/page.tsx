@@ -27,27 +27,6 @@ export default function GoogleDriveClone() {
     setCurrentFolder(item.id);
   };
 
-  // const handleBreadcrumbClick = (index: number) => {
-  //   const newPath = currentPath.slice(0, index + 1);
-  //   setCurrentPath(newPath);
-
-  //   if (index === 0) {
-  //     setCurrentItems(mockFolders);
-  //   } else {
-  //     // Navigate to the correct folder based on path
-  //     let items = mockFiles;
-  //     for (let i = 1; i < newPath.length; i++) {
-  //       const folder = items.find(
-  //         (item) => item.name === newPath[i],
-  //       );
-  //       files = mockFiles.filter((item) => item.parent === folder?.id) || [];};
-  //       const folders = mockFolders.filter((item) => item.parent === folder?.id) || [];
-
-  //     }
-  //     setCurrentItems(items);
-  //   }
-  // };
-
   const breadCrumbs = useMemo(() => {
     const breadCrumbs: Folder[] = [];
 
@@ -117,7 +96,9 @@ export default function GoogleDriveClone() {
             </Button>
           </div>
         </div>
-        <nav className="border-border mt-6 flex items-center space-x-3 border-t pt-6 text-sm">
+      </header>
+      <main className="mx-auto max-w-7xl p-8">
+        <nav className="border-border mt-6 flex items-center space-x-3 border-t py-6 text-sm">
           <Button
             onClick={() => setCurrentFolder(0)}
             variant="ghost"
@@ -142,8 +123,6 @@ export default function GoogleDriveClone() {
             </div>
           ))}
         </nav>
-      </header>
-      <main className="mx-auto max-w-7xl p-8">
         <div className="space-y-2">
           {getCurrentFiles().map((file) => (
             <FileRow key={file.id} file={file} />
