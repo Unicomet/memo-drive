@@ -36,3 +36,9 @@ export const DB_QUERIES = {
       .where(eq(foldersSchema.parent, folderId));
   },
 };
+
+export const DB_MUTATIONS = {
+  createFile: async function (file: typeof filesSchema.$inferInsert) {
+    return await db.insert(filesSchema).values(file);
+  },
+};
