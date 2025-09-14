@@ -10,14 +10,13 @@ import type { files_table, folders_table } from "~/server/db/schema";
 import Link from "next/link";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import type { OurFileRouter } from "~/app/api/uploadthing/core";
 import { UploadButton } from "~/components/uploadthings";
 
 export default function DriveContent(props: {
   files: (typeof files_table.$inferSelect)[];
   folders: (typeof folders_table.$inferSelect)[];
   folderParents: (typeof folders_table.$inferSelect)[];
-  parentFolder: number;
+  currentFolderId: number;
 }) {
   const navigate = useRouter();
 
@@ -131,6 +130,7 @@ export default function DriveContent(props: {
             // Do something with the error.
             alert(`ERROR! ${error.message}`);
           }}
+          input={{ folderId: props.currentFolderId }}
         />
       </main>
     </div>
