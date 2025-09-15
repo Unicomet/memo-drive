@@ -16,6 +16,7 @@ import {
 import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
 import { extractRouterConfig } from "uploadthing/server";
 import { ourFileRouter } from "~/app/api/uploadthing/core";
+import { PostHogProvider } from "./_providers/posthog-provider";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -36,7 +37,9 @@ export default function RootLayout({
       <html lang="en" className={`${geist.variable}`}>
         <body>
           <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
-          <TRPCReactProvider>{children}</TRPCReactProvider>
+          <PostHogProvider>
+            <TRPCReactProvider>{children}</TRPCReactProvider>
+          </PostHogProvider>
         </body>
       </html>
     </ClerkProvider>
