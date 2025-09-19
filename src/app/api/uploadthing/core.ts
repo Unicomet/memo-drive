@@ -54,7 +54,7 @@ export const ourFileRouter = {
         parent: metadata.folderId,
         url: file.ufsUrl,
         fileType: file.type,
-        size: file.size,
+        size: file.size, //It is saved in bytes
         ownerId: metadata.userId,
       });
 

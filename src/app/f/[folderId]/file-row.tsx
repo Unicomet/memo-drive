@@ -31,6 +31,10 @@ const getFileIcon = (item: typeof files_table.$inferSelect) => {
   }
 };
 
+const getFormattedDate = (date: Date) => {
+  return date.toLocaleDateString();
+};
+
 export function FileRow(props: { file: typeof files_table.$inferSelect }) {
   const { file } = props;
 
@@ -67,11 +71,11 @@ export function FileRow(props: { file: typeof files_table.$inferSelect }) {
           <Trash2Icon className="h-5 w-5 text-red-500" />
         </Button>
         <span className="w-28 text-right font-medium">
-          {JSON.stringify(file.updatedAt)}
+          {getFormattedDate(file.updatedAt)}
         </span>
         {file.size && (
-          <span className="bg-muted w-24 rounded-md px-2 py-1 text-right font-mono text-xs">
-            {file.size} KB
+          <span className="bg-muted flex w-20 justify-center rounded-md px-2 py-1 text-right font-mono text-xs">
+            {file.size / 1000} KB
           </span>
         )}
       </div>
@@ -109,9 +113,9 @@ export function FolderRow(props: {
           <Trash2Icon className="h-5 w-5 text-red-500" />
         </Button>
         <span className="w-28 text-right font-medium">
-          {JSON.stringify(folder.updatedAt)}
+          {getFormattedDate(folder.updatedAt)}
         </span>
-        <span className="bg-muted w-24 rounded-md px-2 py-1 text-right font-mono text-xs">
+        <span className="bg-muted flex w-20 justify-center rounded-md px-2 py-1 text-right font-mono text-xs">
           Folder
         </span>
       </div>
