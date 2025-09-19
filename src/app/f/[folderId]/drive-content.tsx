@@ -54,6 +54,7 @@ export default function DriveContent(props: {
         ))}
       </div>
       <UploadButton
+        className="mt-8"
         endpoint="imageUploader"
         onClientUploadComplete={(res) => {
           // Do something with the response
