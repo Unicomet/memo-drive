@@ -41,24 +41,24 @@ export default function RootLayout({
               </Link>
             </button>
           </div>
-          <div className="flex items-center space-x-6">
-            <Search className="text-muted-foreground absolute ms-4 h-4 w-4 -translate-y-1/2 transform" />
-            <Input
-              placeholder="Search in Drive"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="border-border bg-background focus:border-primary h-11 w-96 pl-12 transition-colors duration-200"
-            />
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={toggleTheme}
-              className="border-border hover:bg-muted h-11 w-11 bg-transparent transition-colors duration-200"
-            >
+          <div className="flex h-9 items-center space-x-6">
+            <div className="relative w-full max-w-sm">
+              <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+              <Input
+                placeholder="Search in Drive"
+                name="search-in-drive"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+
+            {/* TODO: Change the height so that be the same as the input, the hypotesis is that the problem is the height of the button */}
+            <Button className="h-full" variant="outline" onClick={toggleTheme}>
               {isDark ? (
-                <Sun className="h-4 w-4" />
+                <Sun className="h-full w-full" />
               ) : (
-                <Moon className="h-4 w-4" />
+                <Moon className="h-full w-full" />
               )}
             </Button>
             <SignedOut>
