@@ -21,30 +21,33 @@ export default function DriveContent(props: {
 
   return (
     <>
-      <nav className="border-border mt-6 flex items-center space-x-3 border-t py-6 text-sm">
-        <Button
-          variant="ghost"
-          className="mr-2 cursor-pointer font-medium hover:text-white"
-          asChild
-        >
-          <Link href="/f/1">My Drive</Link>
-        </Button>
-        {breadcrumbs.map((folder, index) => (
-          <div key={index} className="flex items-center">
-            <ChevronRight className="text-muted-foreground mx-2 h-4 w-4" />
-            <button
-              className={cn(
-                "rounded-md px-3 py-2 font-medium transition-colors duration-200",
-                index === breadcrumbs.length - 1
-                  ? "bg-accent text-accent-foreground font-semibold"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
-              )}
-            >
-              <Link href={`/f/${folder.id}`}>{folder.name}</Link>
-            </button>
-          </div>
-        ))}
-      </nav>
+      <div className="flex w-full items-center">
+        <nav className="mt-6 flex flex-1 items-center gap-x-3 py-6 text-sm">
+          <Button
+            variant="ghost"
+            className="mr-2 cursor-pointer font-medium hover:text-white"
+            asChild
+          >
+            <Link href="/f/1">My Drive</Link>
+          </Button>
+          {breadcrumbs.map((folder, index) => (
+            <div key={index} className="flex items-center">
+              <ChevronRight className="text-muted-foreground mx-2 h-4 w-4" />
+              <button
+                className={cn(
+                  "rounded-md px-3 py-2 font-medium transition-colors duration-200",
+                  index === breadcrumbs.length - 1
+                    ? "bg-accent text-accent-foreground font-semibold"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                )}
+              >
+                <Link href={`/f/${folder.id}`}>{folder.name}</Link>
+              </button>
+            </div>
+          ))}
+        </nav>
+        <Button className="flex-0"> Create Folder</Button>
+      </div>
       <div className="flex flex-col gap-y-4">
         {files.map((file) => (
           <FileRow key={file.id} file={file} />
