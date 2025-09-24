@@ -46,7 +46,7 @@ export default function DriveContent(props: {
             </div>
           ))}
         </nav>
-        <DialogCreateFolder />
+        <DialogCreateFolder currentFolderId={props.currentFolderId} />
       </div>
       <div className="flex flex-col gap-y-4">
         {files.map((file) => (

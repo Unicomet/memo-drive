@@ -1,11 +1,12 @@
 "use server";
 import { auth } from "@clerk/nextjs/server";
-import { DB_QUERIES } from "./db/queries";
+import { DB_MUTATIONS, DB_QUERIES } from "./db/queries";
 import { db } from "./db";
-import { files_table } from "./db/schema";
+import { files_table, type folders_table } from "./db/schema";
 import { and, eq } from "drizzle-orm";
 import { UTApi } from "uploadthing/server";
 import { cookies } from "next/headers";
+import { revalidatePath } from "next/cache";
 
 const uploadThingsApi = new UTApi();
 
@@ -52,6 +53,24 @@ export async function deleteFile(fileId: number) {
   const c = await cookies();
 
   c.set("force-refresh", JSON.stringify(Math.random()));
+
+  return { success: true };
+}
+
+export async function createFolder(name: string, parent: number) {
+  const session = await auth();
+  if (!session.userId) {
+    return { error: "Unauthorized" };
+  }
+
+  const newFolder: typeof folders_table.$inferInsert = {
+    name,
+    parent,
+    ownerId: session.userId,
+  };
+  await DB_MUTATIONS.createFolder(newFolder);
+
+  revalidatePath(`/f/${parent}`);
 
   return { success: true };
 }
