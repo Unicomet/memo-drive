@@ -74,3 +74,14 @@ export async function createFolder(name: string, parent: number) {
 
   return { success: true };
 }
+
+export async function removeFolder(folderId: number) {
+  const session = await auth();
+  if (!session.userId) {
+    return { error: "Unauthorized" };
+  }
+
+  await DB_MUTATIONS.removeFolder(folderId);
+
+  return { success: true };
+}

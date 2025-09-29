@@ -12,7 +12,8 @@ import type { files_table } from "~/server/db/schema";
 import { type folders_table } from "../../../server/db/schema";
 import Link from "next/link";
 import { Button } from "~/components/ui/button";
-import { deleteFile } from "~/server/actions";
+import { deleteFile, removeFolder } from "~/server/actions";
+import { useRouter } from "next/navigation";
 
 const getFileIcon = (item: typeof files_table.$inferSelect) => {
   switch (item.fileType) {
@@ -87,6 +88,7 @@ export function FolderRow(props: {
   folder: typeof folders_table.$inferSelect;
 }) {
   const { folder } = props;
+  const router = useRouter();
 
   return (
     <div className="group flex cursor-pointer items-center rounded-xl border-b p-5 transition-all duration-200 hover:border-gray-100">
@@ -109,6 +111,10 @@ export function FolderRow(props: {
           variant="ghost"
           size="icon"
           className="border-border hover:bg-muted h-9 w-9 rounded-full border bg-transparent transition-colors duration-200"
+          onClick={async () => {
+            await removeFolder(folder.id);
+            router.refresh();
+          }}
         >
           <Trash2Icon className="h-5 w-5 text-red-500" />
         </Button>
