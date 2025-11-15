@@ -29,7 +29,7 @@ export default function DriveContent(props: {
             className="mr-2 cursor-pointer font-medium hover:text-white"
             asChild
           >
-            <Link href="/f/1">My Drive</Link>
+            <Link href="/dashboard/folder/1">My Drive</Link>
           </Button>
           {breadcrumbs.map((folder, index) => (
             <div key={index} className="flex items-center">
@@ -42,7 +42,9 @@ export default function DriveContent(props: {
                     : "text-muted-foreground hover:bg-muted hover:text-foreground",
                 )}
               >
-                <Link href={`/f/${folder.id}`}>{folder.name}</Link>
+                <Link href={`/dashboard/folder/${folder.id}`}>
+                  {folder.name}
+                </Link>
               </button>
             </div>
           ))}

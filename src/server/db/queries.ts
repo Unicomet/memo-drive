@@ -139,7 +139,7 @@ export const DB_MUTATIONS = {
       }
 
       for (const { url } of urlFilesToDelete) {
-        const fileKey = url.replace("https://mdq5gee63i.ufs.sh/f/", "");
+        const fileKey = url.replace("https://mdq5gee63i.ufs.sh/folder/", "");
         const utApiResult = await uploadThingsApi.deleteFiles(fileKey);
 
         if (!utApiResult.success) {

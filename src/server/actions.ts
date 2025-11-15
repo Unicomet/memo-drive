@@ -39,7 +39,10 @@ export async function deleteFile(fileId: number) {
     return { error: "File not found" };
   }
 
-  const fileKey = file.url.replace("https://mdq5gee63i.ufs.sh/f/", "");
+  const fileKey = file.url.replace(
+    "https://mdq5gee63i.ufs.sh/dashboard/folder/",
+    "",
+  );
 
   const utApiResult = await uploadThingsApi.deleteFiles(fileKey);
 
@@ -73,7 +76,7 @@ export async function createFolder(name: string, parent: number) {
   };
   await DB_MUTATIONS.createFolder(newFolder);
 
-  revalidatePath(`/f/${parent}`);
+  revalidatePath(`/dashboard/folder/${parent}`);
 
   return { success: true };
 }

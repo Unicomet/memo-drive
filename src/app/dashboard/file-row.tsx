@@ -114,7 +114,10 @@ export function FolderRow(props: {
 
   return (
     <div className="group flex cursor-pointer items-center rounded-xl border-b p-5 transition-all duration-200 hover:border-gray-100">
-      <Link href={`/f/${folder.id}`} className="mr-5 flex items-center gap-6">
+      <Link
+        href={`/dashboard/folder/${folder.id}`}
+        className="mr-5 flex items-center gap-6"
+      >
         <div className="mr-5 flex items-center gap-6">
           <FolderIcon
             className={cn(

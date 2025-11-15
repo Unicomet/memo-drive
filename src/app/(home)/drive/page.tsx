@@ -21,7 +21,7 @@ export default async function DrivePage() {
             "use server";
             const newRootFolderId = await DB_MUTATIONS.onboardUser(user.userId);
             await sendOnboardingEmail();
-            redirect(`/f/${newRootFolderId}`);
+            redirect(`/dashboard/folder/${newRootFolderId}`);
           }}
         >
           <Button>Create New Drive</Button>
@@ -30,5 +30,5 @@ export default async function DrivePage() {
     );
   }
 
-  redirect(`/f/${existingRootFolder.id}`);
+  redirect(`/dashboard/folder/${existingRootFolder.id}`);
 }
