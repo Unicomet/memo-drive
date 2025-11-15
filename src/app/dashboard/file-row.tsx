@@ -97,8 +97,8 @@ export function FileRow(props: { file: typeof files_table.$inferSelect }) {
           {getFormattedDate(file.updatedAt)}
         </span>
         {file.size && (
-          <span className="bg-muted flex w-20 justify-center rounded-md px-2 py-1 text-right font-mono text-xs">
-            {file.size / 1000} KB
+          <span className="bg-muted flex w-20 justify-center rounded-md px-2 py-1 text-center font-mono text-xs">
+            {Math.round(file.size / 1000)} KB
           </span>
         )}
       </div>
@@ -146,7 +146,7 @@ export function FolderRow(props: {
         <span className="w-28 text-right font-medium">
           {getFormattedDate(folder.updatedAt)}
         </span>
-        <span className="bg-muted flex w-20 justify-center rounded-md px-2 py-1 text-right font-mono text-xs">
+        <span className="bg-muted flex w-20 justify-center rounded-md px-2 py-1 text-center font-mono text-xs">
           Folder
         </span>
       </div>
