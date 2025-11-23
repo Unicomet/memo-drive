@@ -2,16 +2,22 @@
 import { auth, currentUser, clerkClient } from "@clerk/nextjs/server";
 import { DB_MUTATIONS, DB_QUERIES } from "./db/queries";
 import { db } from "./db";
-import { files_access, files_table, type folders_table } from "./db/schema";
+import {
+  files_table,
+  items_roles_users,
+  type folders_table,
+} from "./db/schema";
 import { and, eq } from "drizzle-orm";
 import { UTApi } from "uploadthing/server";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { EmailTemplate } from "~/components/email-welcome";
 import { Resend } from "resend";
+import { hasPermission, ID_ROLES } from "~/lib/auth";
 
 const uploadThingsApi = new UTApi();
 const resend = new Resend(process.env.RESEND_API_KEY);
+const clerkClientBackend = await clerkClient();
 
 export async function deleteFolder(folderId: number) {
   const session = await auth();
@@ -25,7 +31,17 @@ export async function deleteFolder(folderId: number) {
 export async function deleteFile(fileId: number) {
   const session = await auth();
   if (!session.userId) {
-    return { error: "Unauthorized" };
+    return { success: false, error: "Unauthorized" };
+  }
+
+  const resource = {
+    id: fileId,
+    type: "file" as const,
+  };
+
+  const isAuthorized = await hasPermission(session.userId, resource, "delete");
+  if (!isAuthorized) {
+    return { success: false, error: "You are not allowed to delete this file" };
   }
 
   const [file] = await db
@@ -36,7 +52,7 @@ export async function deleteFile(fileId: number) {
     );
 
   if (!file) {
-    return { error: "File not found" };
+    return { success: false, error: "File not found" };
   }
 
   const fileKey = file.url.replace(
@@ -47,7 +63,7 @@ export async function deleteFile(fileId: number) {
   const utApiResult = await uploadThingsApi.deleteFiles(fileKey);
 
   if (!utApiResult.success) {
-    return { error: "Failed to delete file from storage" };
+    return { success: false, error: "Failed to delete file from storage" };
   }
 
   console.log(utApiResult);
@@ -60,7 +76,7 @@ export async function deleteFile(fileId: number) {
 
   c.set("force-refresh", JSON.stringify(Math.random()));
 
-  return { success: true };
+  return { success: true, error: null };
 }
 
 export async function createFolder(name: string, parent: number) {
@@ -129,10 +145,13 @@ export async function shareFileToUser(fileId: number, emailAddress: string) {
   //Check if this file is already shared with this user
 
   //Add user so that have access to the file
-  const client = await clerkClient();
-  const { data, totalCount } = await client.users.getUserList({
+  const { data, totalCount } = await clerkClientBackend.users.getUserList({
     query: emailAddress,
   });
+
+  if (data.length === 0) {
+    return { error: "User not found" };
+  }
 
   console.log("Clerk Backend User Search Result:", data);
   if (!data?.[0]) {
@@ -142,10 +161,11 @@ export async function shareFileToUser(fileId: number, emailAddress: string) {
   const userId = data[0].id;
 
   const [result] = await db
-    .insert(files_access)
+    .insert(items_roles_users)
     .values({
       userId: userId,
-      fileId: fileId,
+      itemId: fileId,
+      role: ID_ROLES.ADMIN, // Viewer role
     })
     .$returningId();
 
@@ -155,4 +175,49 @@ export async function shareFileToUser(fileId: number, emailAddress: string) {
 
   console.log(result);
   return { success: true };
+}
+
+export async function getInvitedUsers(fileId: number) {
+  try {
+    const invitedUsers = await db
+      .select({
+        userId: items_roles_users.userId,
+        role: items_roles_users.role,
+      })
+      .from(items_roles_users)
+      .where(eq(items_roles_users.itemId, fileId));
+
+    console.log("Invited: ", invitedUsers);
+    console.log(invitedUsers.map((invited) => invited.userId));
+
+    if (invitedUsers.length === 0) {
+      return { data: [], error: null };
+    }
+
+    const invitedUsersData = await clerkClientBackend.users.getUserList({
+      userId: invitedUsers.map((invited) => invited.userId),
+    });
+
+    console.log("Invited Users Data: ", invitedUsersData);
+
+    // console.log(
+    //   invitedUsers.find(
+    //     (invited) => invited.userId === "user_33S8IjBHQpRu46IJYnpPL7vHdgM",
+    //   )!.role,
+    // );
+
+    const data = invitedUsersData.data.map((userData) => ({
+      emailAddress: userData.emailAddresses[0]!.emailAddress,
+      fullName: userData.firstName + " " + userData.lastName,
+      role: invitedUsers.find((invited) => invited.userId === userData.id)
+        ?.role,
+    }));
+
+    console.log(data);
+
+    return { data, error: null };
+  } catch (e) {
+    console.error("error: Failed to get invited users", e);
+    return { data: null, error: "Failed to get invited users" };
+  }
 }

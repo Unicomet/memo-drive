@@ -53,10 +53,35 @@ export const folders_table = createTable(
   },
 );
 
-export const files_access = createTable("files_access", {
+export const items_roles = createTable("items_roles", {
   id: bigint("id", { mode: "number", unsigned: true })
     .primaryKey()
     .autoincrement(),
-  userId: text("user_id").notNull(),
-  fileId: bigint("file_ id", { mode: "number", unsigned: true }).notNull(),
+  role: text("role").notNull(),
+  roleDescription: text("role_description").notNull(),
 });
+
+export const items_roles_users = createTable("items_roles_users", {
+  id: bigint("id", { mode: "number", unsigned: true })
+    .primaryKey()
+    .autoincrement(),
+  itemId: bigint("item_id", { mode: "number", unsigned: true }).notNull(),
+  role: bigint("role_id", { mode: "number", unsigned: true }).notNull(),
+  userId: text("user_id").notNull(),
+});
+
+// export const items_roles_permissions = createTable("items_roles_permissions", {
+//   id: bigint("id", { mode: "number", unsigned: true })
+//     .primaryKey()
+//     .autoincrement(),
+//   roleId: bigint("role_id", { mode: "number", unsigned: true }).notNull(),
+//   permissionId: bigint("permission_id", { mode: "number", unsigned: true }),
+// });
+
+// export const permissions = createTable("permissions", {
+//   id: bigint("id", { mode: "number", unsigned: true })
+//     .primaryKey()
+//     .autoincrement(),
+//   name: text("name").notNull(),
+//   description: text("description").notNull(),
+// });

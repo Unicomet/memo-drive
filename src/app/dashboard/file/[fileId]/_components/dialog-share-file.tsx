@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { eq } from "drizzle-orm";
+import { useEffect, useState } from "react";
 import { useShareFileDialog } from "~/app/_providers/shareFileDialog/use-share-file-dialog";
 import { Button } from "~/components/ui/button";
 import {
@@ -14,18 +15,50 @@ import {
 } from "~/components/ui/dialog";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import { shareFileToUser } from "~/server/actions";
+import { getInvitedUsers, shareFileToUser } from "~/server/actions";
 
 export function DialogShareFile() {
   const [emailAddress, setEmailAddress] = useState("");
-
+  const [invitedUsers, setInvitedUsers] = useState<
+    { emailAddress: string; fullName: string; role: number }[] | null
+  >([]);
+  const [errorLoadingInvitedUsers, setErrorLoadingInvitedUsers] =
+    useState(false);
+  const [hasErrorSharingFile, setHasErrorSharingFile] = useState(false);
+  const [errorSharingFile, setErrorSharingFile] = useState("");
   const { isOpen, setIsOpen, fileId } = useShareFileDialog();
+  const [loading, setLoading] = useState(true);
 
-  console.log("isOpen: ", isOpen, " fileId: ", fileId);
+  useEffect(() => {
+    setEmailAddress("");
+    setInvitedUsers([]);
+    setErrorLoadingInvitedUsers(false);
+    setHasErrorSharingFile(false);
+    setErrorSharingFile("");
+    setLoading(true);
+    async function loadData() {
+      const invitedUsers = await getInvitedUsers(fileId);
+      if (invitedUsers.error) {
+        setErrorLoadingInvitedUsers(true);
+        return;
+      }
+      console.log("FileId:", fileId, " Invited Users:", invitedUsers);
+      setInvitedUsers(invitedUsers.data);
+      setLoading(false);
+    }
+    loadData();
+  }, [fileId]);
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    await shareFileToUser(fileId, emailAddress);
+    const result = await shareFileToUser(fileId, emailAddress);
+    if (result.error) {
+      setHasErrorSharingFile(true);
+      setErrorSharingFile("Error sharing file: " + result.error);
+      return;
+    }
     setIsOpen(false);
+    setEmailAddress("");
   };
 
   return (
@@ -38,7 +71,7 @@ export function DialogShareFile() {
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center">
             <div className="grid flex-1 gap-2">
               <Label htmlFor="link" className="sr-only">
                 Email Address
@@ -49,15 +82,44 @@ export function DialogShareFile() {
                 value={emailAddress}
                 onChange={(e) => setEmailAddress(e.target.value)}
               />
+              {hasErrorSharingFile && (
+                <p className="text-sm text-red-500">{errorSharingFile}</p>
+              )}
             </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            <h3 className="text-sm font-medium">Invited Users:</h3>
+            {(() => {
+              if (loading) return <p className="text-sm">Loading...</p>;
+              if (errorLoadingInvitedUsers)
+                return (
+                  <p className="text-sm text-red-500">
+                    Error loading invited users.
+                  </p>
+                );
+              if (!invitedUsers?.length)
+                return (
+                  <p className="text-muted-foreground text-sm">
+                    No users have been invited yet.
+                  </p>
+                );
+
+              return (
+                <ul className="list-disc pl-5">
+                  {invitedUsers.map((user) => (
+                    <li key={user.emailAddress} className="text-sm">
+                      {user.fullName} - ({user.emailAddress})
+                    </li>
+                  ))}
+                </ul>
+              );
+            })()}
           </div>
           <DialogFooter className="sm:justify-start lg:justify-end">
             <DialogClose asChild>
-              <Button type="submit" variant="secondary">
-                Close
-              </Button>
+              <Button variant="secondary">Close</Button>
             </DialogClose>
-            <Button>Share</Button>
+            <Button type="submit">Share</Button>
           </DialogFooter>
         </form>
       </DialogContent>
