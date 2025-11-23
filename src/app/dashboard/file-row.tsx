@@ -17,7 +17,6 @@ import Link from "next/link";
 import { Button } from "~/components/ui/button";
 import { deleteFile, removeFolder } from "~/server/actions";
 import { useRouter } from "next/navigation";
-import { DialogShareFile } from "./file/[fileId]/_components/dialog-share-file";
 import { useShareFileDialog } from "../_providers/shareFileDialog/use-share-file-dialog";
 import { toast } from "sonner";
 
@@ -48,6 +47,8 @@ export function FileRow(props: { file: typeof files_table.$inferSelect }) {
     isOpen: isShareDialogOpen,
     setIsOpen: setShareDialogOpen,
     setFileId: setShareDialogFileId,
+    setInvitedUsersEmails,
+    setInvitedUsersIds,
   } = useShareFileDialog();
 
   const IconComponent = getFileIcon(file);
@@ -77,6 +78,7 @@ export function FileRow(props: { file: typeof files_table.$inferSelect }) {
           aria-label="Share file"
           onClick={() => {
             console.log(isShareDialogOpen);
+
             setShareDialogFileId(file.id);
             setShareDialogOpen(true);
           }}
@@ -88,7 +90,12 @@ export function FileRow(props: { file: typeof files_table.$inferSelect }) {
           size="icon"
           className="border-border hover:bg-muted h-9 w-9 rounded-full border bg-transparent transition-colors duration-200"
           onClick={async () => {
-            await deleteFile(file.id);
+            const { success, error } = await deleteFile(file.id);
+            if (!success) {
+              toast.error(error ?? "Failed to delete file");
+              return;
+            }
+            toast.success("File deleted successfully");
           }}
           aria-label="Delete file"
         >
