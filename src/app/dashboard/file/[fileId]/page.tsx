@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { and, eq } from "drizzle-orm";
 import { db } from "~/server/db";
-import { files_access, files_table } from "~/server/db/schema";
+import { files_table, items_roles_users } from "~/server/db/schema";
 import { FileRow } from "../../file-row";
 
 export default async function FilePage(props: { params: { fileId: string } }) {
@@ -30,11 +30,11 @@ export default async function FilePage(props: { params: { fileId: string } }) {
   // Check if the user has permission to access the file
   const [hasAccess] = await db
     .select()
-    .from(files_access)
+    .from(items_roles_users)
     .where(
       and(
-        eq(files_access.fileId, parsedFileId),
-        eq(files_access.userId, session.userId),
+        eq(items_roles_users.itemId, parsedFileId),
+        eq(items_roles_users.userId, session.userId),
       ),
     );
 
