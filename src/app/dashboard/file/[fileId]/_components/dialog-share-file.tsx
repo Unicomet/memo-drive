@@ -89,31 +89,25 @@ export function DialogShareFile() {
           </div>
           <div className="flex flex-col gap-2">
             <h3 className="text-sm font-medium">Invited Users:</h3>
-            {(() => {
-              if (loading) return <p className="text-sm">Loading...</p>;
-              if (errorLoadingInvitedUsers)
-                return (
-                  <p className="text-sm text-red-500">
-                    Error loading invited users.
-                  </p>
-                );
-              if (!invitedUsers?.length)
-                return (
-                  <p className="text-muted-foreground text-sm">
-                    No users have been invited yet.
-                  </p>
-                );
-
-              return (
-                <ul className="list-disc pl-5">
-                  {invitedUsers.map((user) => (
-                    <li key={user.emailAddress} className="text-sm">
-                      {user.fullName} - ({user.emailAddress})
-                    </li>
-                  ))}
-                </ul>
-              );
-            })()}
+            {loading ? (
+              <p className="text-sm">Loading...</p>
+            ) : errorLoadingInvitedUsers ? (
+              <p className="text-sm text-red-500">
+                Error loading invited users.
+              </p>
+            ) : !invitedUsers?.length ? (
+              <p className="text-muted-foreground text-sm">
+                No users have been invited yet.
+              </p>
+            ) : (
+              <ul className="list-disc pl-5">
+                {invitedUsers.map((user) => (
+                  <li key={user.emailAddress} className="text-sm">
+                    {user.fullName || user.emailAddress} - ({user.emailAddress})
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
           <DialogFooter className="sm:justify-start lg:justify-end">
             <DialogClose asChild>
