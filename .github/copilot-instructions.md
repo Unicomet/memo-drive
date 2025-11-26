@@ -1,5 +1,3 @@
-<!-- Auto-generated guidance for AI coding agents working on this repo -->
-
 # copilot-instructions for drive-clone-2
 
 Purpose: concise, actionable notes so an AI coding agent can be productive immediately.
