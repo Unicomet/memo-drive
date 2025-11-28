@@ -62,7 +62,9 @@ export async function POST(request: Request) {
         console.log(`Unhandled event type ${event.type}.`);
     }
   } catch (err) {
-    console.log(`⚠️  Webhook signature verification failed.`, err.message);
+    if (err instanceof Error) {
+      console.log(`⚠️  Webhook signature verification failed.`, err.message);
+    }
     return new Response("Bad Request", { status: 400 });
   }
 

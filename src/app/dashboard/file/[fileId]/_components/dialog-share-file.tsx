@@ -46,7 +46,7 @@ export function DialogShareFile() {
       setInvitedUsers(invitedUsers.data);
       setLoading(false);
     }
-    loadData();
+    void loadData();
   }, [fileId]);
 
   const handleSubmit = async (event: React.FormEvent) => {

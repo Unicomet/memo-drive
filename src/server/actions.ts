@@ -212,12 +212,39 @@ export async function getInvitedUsers(fileId: number) {
     //   )!.role,
     // );
 
-    const data = invitedUsersData.data.map((userData) => ({
-      emailAddress: userData.emailAddresses[0]!.emailAddress,
-      fullName: userData.firstName + " " + userData.lastName,
-      role: invitedUsers.find((invited) => invited.userId === userData.id)
-        ?.role,
-    }));
+    const data = invitedUsersData.data.map((userData) => {
+      const invited = invitedUsers.find(
+        (invited) => invited.userId === userData.id,
+      );
+      if (!invited) {
+        console.error(
+          `Invited user not found for id (from Stripe) ${userData.id} in DB`,
+        );
+        throw new Error(
+          `Invited user not found for id (from Stripe) ${userData.id} in DB`,
+        );
+      }
+
+      const emailAddress = userData.emailAddresses?.[0]?.emailAddress;
+      if (!emailAddress) {
+        console.error(
+          `Email address not found for id (from Stripe) ${userData.id} in DB`,
+        );
+        throw new Error(
+          `Email address not found for user id (from Stripe) ${userData.id}`,
+        );
+      }
+
+      const fullName = [userData.firstName, userData.lastName]
+        .filter(Boolean)
+        .join(" ");
+
+      return {
+        emailAddress,
+        fullName,
+        role: invited.role,
+      };
+    });
 
     console.log(data);
 
