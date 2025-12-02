@@ -44,7 +44,7 @@ export async function getStripeSubByUserId(userId: string) {
   if (!stripeCustomerId) {
     return null;
   }
-  return stripeCustomerId;
+  return STRIPE_SUB_CACHE_KV.get(stripeCustomerId);
 }
 
 export async function syncStripeDataToKv(stripeCustomerId: string) {
