@@ -1,73 +1,76 @@
-import stripe from "stripe";
-import { env } from "~/env";
+import { headers } from "next/headers";
+import { NextResponse } from "next/server";
+import type Stripe from "stripe";
+import { stripe } from "~/server/subscriptions/stripe";
+import { syncStripeDataToKv } from "~/server/subscriptions/store";
 
-export async function POST(request: Request) {
-  const endpointSecret = env.STRIPE_WEBHOOK_SECRET;
-  const signature = request.headers.get("stripe-signature");
+const allowedEvents: Stripe.Event.Type[] = [
+  "checkout.session.completed",
+  "customer.subscription.created",
+  "customer.subscription.updated",
+  "customer.subscription.deleted",
+  "customer.subscription.paused",
+  "customer.subscription.resumed",
+  "customer.subscription.pending_update_applied",
+  "customer.subscription.pending_update_expired",
+  "customer.subscription.trial_will_end",
+  "invoice.paid",
+  "invoice.payment_failed",
+  "invoice.payment_action_required",
+  "invoice.upcoming",
+  "invoice.marked_uncollectible",
+  "invoice.payment_succeeded",
+  "payment_intent.succeeded",
+  "payment_intent.payment_failed",
+  "payment_intent.canceled",
+];
 
-  if (!signature || !endpointSecret) {
-    console.log("Missing signature or endpoint secret.");
-    return new Response("Bad Request", { status: 400 });
+async function processEvent(event: Stripe.Event) {
+  // Skip processing if the event isn't one I'm tracking (list of all events below)
+  if (!allowedEvents.includes(event.type)) return;
+
+  // All the events I track have a customerId
+  const { customer: customerId } = event?.data?.object as {
+    customer: string; // Sadly TypeScript does not know this
+  };
+
+  // This helps make it typesafe and also lets me know if my assumption is wrong
+  if (typeof customerId !== "string") {
+    throw new Error(
+      `[STRIPE HOOK][CANCER] ID isn't string.\nEvent type: ${event.type}`,
+    );
+  }
+
+  return await syncStripeDataToKv(customerId);
+}
+
+export async function POST(req: Request) {
+  const body = await req.text();
+  const signature = (await headers()).get("Stripe-Signature");
+
+  if (!signature) return NextResponse.json({}, { status: 400 });
+
+  async function doEventProcessing() {
+    if (typeof signature !== "string") {
+      throw new Error("[STRIPE HOOK] Header isn't a string???");
+    }
+
+    const event = stripe.webhooks.constructEvent(
+      body,
+      signature,
+      process.env.STRIPE_WEBHOOK_SECRET!,
+    );
+    waitUntil(processEvent(event));
   }
 
   try {
-    const event = stripe.webhooks.constructEvent(
-      await request.text(),
-      signature,
-      endpointSecret,
-    );
-    let subscription;
-    let status;
-    // Handle the event
-
-    switch (event.type) {
-      case "customer.subscription.trial_will_end":
-        subscription = event.data.object;
-        status = subscription.status;
-        console.log(`Subscription status is ${status}.`);
-        // Then define and call a method to handle the subscription trial ending.
-        // handleSubscriptionTrialEnding(subscription);
-        break;
-      case "customer.subscription.deleted":
-        subscription = event.data.object;
-        status = subscription.status;
-        console.log(`Subscription status is ${status}.`);
-        // Then define and call a method to handle the subscription deleted.
-        // handleSubscriptionDeleted(subscriptionDeleted);
-        break;
-      case "customer.subscription.created":
-        subscription = event.data.object;
-        status = subscription.status;
-        console.log(`Subscription status is ${status}.`);
-        // Then define and call a method to handle the subscription created.
-        // handleSubscriptionCreated(subscription);
-        break;
-      case "customer.subscription.updated":
-        subscription = event.data.object;
-        status = subscription.status;
-        console.log(`Subscription status is ${status}.`);
-        // Then define and call a method to handle the subscription update.
-        // handleSubscriptionUpdated(subscription);
-        break;
-      case "entitlements.active_entitlement_summary.updated":
-        subscription = event.data.object;
-        console.log(
-          `Active entitlement summary updated for ${subscription.customer}.`,
-        );
-        // Then define and call a method to handle active entitlement summary updated
-        // handleEntitlementUpdated(subscription);
-        break;
-      default:
-        // Unexpected event type
-        console.log(`Unhandled event type ${event.type}.`);
-    }
-  } catch (err) {
-    if (err instanceof Error) {
-      console.log(`⚠️  Webhook signature verification failed.`, err.message);
-    }
-    return new Response("Bad Request", { status: 400 });
+    await doEventProcessing();
+  } catch (error) {
+    console.error("[STRIPE HOOK] Error processing event", error);
   }
 
-  // Return a 200 response to acknowledge receipt of the event
-  return new Response("OK", { status: 200 });
+  return NextResponse.json({ received: true });
+}
+function waitUntil(arg0: Promise<{ status: string } | undefined>) {
+  throw new Error("Function not implemented.");
 }

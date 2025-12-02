@@ -1,5 +1,3 @@
-"use server";
-
 import { Button } from "~/components/ui/button";
 import { env } from "~/env";
 import { createCheckoutSession } from "~/server/subscriptions/actions";
@@ -40,14 +38,7 @@ export default function PricingPage() {
           client-reference-id="user_1234"
         ></stripe-pricing-table>
       </div>
-      <form
-        // onSubmit={async () => {
-        //   "use server";
-        //   return createCheckoutSession;
-        // }}
-        action={createCheckoutSession}
-        className="text-center"
-      >
+      <form action={createCheckoutSession} className="text-center">
         <input
           type="hidden"
           id="lookup_key"

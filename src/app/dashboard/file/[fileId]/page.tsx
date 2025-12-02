@@ -4,8 +4,10 @@ import { db } from "~/server/db";
 import { files_table, items_roles_users } from "~/server/db/schema";
 import { FileRow } from "../../file-row";
 
-export default async function FilePage(props: { params: { fileId: string } }) {
-  const { fileId } = props.params;
+export default async function FilePage(props: {
+  params: Promise<{ fileId: string }>;
+}) {
+  const { fileId } = await props.params;
 
   const parsedFileId = parseInt(fileId);
   if (isNaN(parsedFileId)) {

@@ -1,21 +1,22 @@
 "use server";
 
 import { auth, clerkClient } from "@clerk/nextjs/server";
-import { getStripeSubByUserId, redis, STRIPE_CUSTOMER_ID_KV } from "./store";
+import { STRIPE_CUSTOMER_ID_KV } from "./store";
 import { redirect } from "next/navigation";
-import Stripe from "stripe";
 import { env } from "~/env";
+import { stripe } from "./stripe";
 
-const stripe = new Stripe(env.STRIPE_SECRET_KEY);
 const domain = "http://localhost:3000";
 
-export async function createCheckoutSession({ return_url = "/drive" }) {
+export async function createCheckoutSession(formData: FormData) {
+  // eslint-disable-next-line @typescript-eslint/no-base-to-string
+  const return_url = formData.get("return_url")?.toString() ?? "/drive";
   const session = await auth();
   if (!session.userId) {
     redirect("/login");
   }
 
-  // //Check if user has already an active subscription
+  // Check if user has already an active subscription
   // const existingSub = await getStripeSubByUserId(session.userId);
   // if (existingSub) {
   //   throw new Error("You already have an active subscription");
