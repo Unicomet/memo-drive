@@ -41,8 +41,8 @@ export default function PricingPage() {
       <form action={createCheckoutSession} className="text-center">
         <input
           type="hidden"
-          id="subscription_tier"
-          name="subscription_tier"
+          id="subscription_type"
+          name="subscription_type"
           value="starter_monthly"
         />
         <Button id="checkout-and-portal-button" type="submit">
@@ -52,8 +52,8 @@ export default function PricingPage() {
       <form action={createCheckoutSession} className="text-center">
         <input
           type="hidden"
-          id="subscription_tier"
-          name="subscription_tier"
+          id="subscription_type"
+          name="subscription_type"
           value="pro_monthly"
         />
         <Button id="checkout-and-portal-button" type="submit">

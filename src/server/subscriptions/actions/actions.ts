@@ -10,7 +10,7 @@ const domain = "http://localhost:3000";
 
 export async function createCheckoutSession(formData: FormData) {
   // eslint-disable-next-line @typescript-eslint/no-base-to-string
-  const subscriptionTier = formData.get("subscription_tier")?.toString();
+  const subscriptionType = formData.get("subscription_type")?.toString();
   const session = await auth();
   if (!session.userId) {
     redirect("/login");
@@ -49,6 +49,19 @@ export async function createCheckoutSession(formData: FormData) {
     stripeCustomerId = newCustomer.id;
   }
 
+  let subscriptionTier: "starter" | "pro";
+
+  switch (subscriptionType) {
+    case "starter_monthly":
+      subscriptionTier = "starter";
+      break;
+    case "pro_monthly":
+      subscriptionTier = "pro";
+      break;
+    default:
+      throw new Error("Invalid subscription type");
+  }
+
   const checkoutSession = await stripe.checkout.sessions.create({
     customer: stripeCustomerId,
     success_url: `${domain}/purchase/success?session_id={CHECKOUT_SESSION_ID}`,
@@ -56,6 +69,7 @@ export async function createCheckoutSession(formData: FormData) {
     subscription_data: {
       metadata: {
         userId: session.userId,
+        subscriptionTier,
       },
     },
     allow_promotion_codes: true,
@@ -63,7 +77,7 @@ export async function createCheckoutSession(formData: FormData) {
     line_items: [
       {
         price:
-          subscriptionTier === "starter_monthly"
+          subscriptionType === "starter_monthly"
             ? env.STRIPE_PRICE_ID_STARTER_MONTHLY
             : env.STRIPE_PRICE_ID_PRO_MONTHLY,
         quantity: 1,
