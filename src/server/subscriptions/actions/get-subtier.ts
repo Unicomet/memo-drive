@@ -14,6 +14,9 @@ export async function getSubtierForUser() {
     return "free";
   }
 
-  if (subData.status === "active") return "pro";
-  return "free";
+  if (subData.status !== "active") {
+    return "free";
+  }
+
+  return subData.subscriptionTier ?? "free";
 }

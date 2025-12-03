@@ -1,7 +1,6 @@
 import { Redis } from "@upstash/redis";
 import { stripe } from "./stripe";
 import type { Stripe } from "stripe";
-import { env } from "~/env";
 
 export const redis = Redis.fromEnv();
 
@@ -10,14 +9,12 @@ export const STRIPE_SUB_CACHE_KV = {
     return `stripe:customer:${stripeCustomerId}:stripe-sub-status`;
   },
   async get(stripeCustomerId: string): Promise<STRIPE_SUB_CACHE> {
-    const response = await redis.get<string>(
-      this.generateKey(stripeCustomerId),
-    );
+    const response = await redis.get(this.generateKey(stripeCustomerId));
     if (!response) {
       return { status: "none" };
     }
 
-    return JSON.parse(response) as STRIPE_SUB_CACHE;
+    return response as STRIPE_SUB_CACHE;
   },
   async set(stripeCustomerId: string, data: STRIPE_SUB_CACHE) {
     await redis.set(this.generateKey(stripeCustomerId), JSON.stringify(data));
@@ -101,6 +98,7 @@ export type STRIPE_SUB_CACHE =
         brand: string | null; // e.g., "visa", "mastercard"
         last4: string | null; // e.g., "4242"
       } | null;
+      subscriptionTier: string | null;
     }
   | {
       status: "none";
