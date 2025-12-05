@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { stripe } from "~/server/subscriptions/stripe";
 import { syncStripeDataToKv } from "~/server/subscriptions/store";
+import { waitUntil } from "@vercel/functions";
 
 const allowedEvents: Stripe.Event.Type[] = [
   "checkout.session.completed",
@@ -70,7 +71,4 @@ export async function POST(req: Request) {
   }
 
   return NextResponse.json({ received: true });
-}
-function waitUntil(arg0: Promise<{ status: string } | undefined>) {
-  throw new Error("Function not implemented.");
 }
