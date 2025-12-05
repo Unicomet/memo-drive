@@ -13,7 +13,7 @@ export async function createCheckoutSession(formData: FormData) {
   const subscriptionType = formData.get("subscription_type")?.toString();
   const session = await auth();
   if (!session.userId) {
-    redirect("/login");
+    redirect("/sign-in");
   }
 
   // // I disabled this because prevents users to subscribe when they left checkout and didn't subscribe
