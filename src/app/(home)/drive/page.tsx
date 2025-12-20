@@ -7,6 +7,8 @@ import { DB_MUTATIONS, DB_QUERIES } from "~/server/db/queries";
 export default async function DrivePage() {
   const user = await auth();
 
+  const { error } = await sendOnboardingEmail();
+
   if (!user.userId) {
     return <div>Not Authorized</div>;
   }
@@ -20,7 +22,10 @@ export default async function DrivePage() {
           action={async () => {
             "use server";
             const newRootFolderId = await DB_MUTATIONS.onboardUser(user.userId);
-            await sendOnboardingEmail();
+            const { error } = await sendOnboardingEmail();
+            if (error) {
+              console.error("Failed to send onboarding email:", error);
+            }
             redirect(`/dashboard/folder/${newRootFolderId}`);
           }}
         >

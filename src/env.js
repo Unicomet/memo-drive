@@ -25,6 +25,10 @@ export const env = createEnv({
     UPSTASH_REDIS_REST_TOKEN: z.string(),
     STRIPE_PRICE_ID_STARTER_MONTHLY: z.string(),
     STRIPE_PRICE_ID_PRO_MONTHLY: z.string(),
+    QSTASH_URL: z.string(),
+    QSTASH_TOKEN: z.string(),
+    QSTASH_CURRENT_SIGNING_KEY: z.string(),
+    QSTASH_NEXT_SIGNING_KEY: z.string(),
   },
 
   /**
@@ -69,6 +73,10 @@ export const env = createEnv({
     STRIPE_PRICE_ID_STARTER_MONTHLY:
       process.env.STRIPE_PRICE_ID_STARTER_MONTHLY,
     STRIPE_PRICE_ID_PRO_MONTHLY: process.env.STRIPE_PRICE_ID_PRO_MONTHLY,
+    QSTASH_URL: process.env.QSTASH_URL,
+    QSTASH_TOKEN: process.env.QSTASH_TOKEN,
+    QSTASH_CURRENT_SIGNING_KEY: process.env.QSTASH_CURRENT_SIGNING_KEY,
+    QSTASH_NEXT_SIGNING_KEY: process.env.QSTASH_NEXT_SIGNING_KEY,
   } /** * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
    * useful for Docker builds.
    */,
