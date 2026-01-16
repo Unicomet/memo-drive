@@ -12,6 +12,11 @@ const config = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  serverExternalPackages: [
+    "@opentelemetry/instrumentation",
+    "import-in-the-middle",
+    "zlib",
+  ],
   async rewrites() {
     //Set a reverse proxy for postHog analytics
     return [
