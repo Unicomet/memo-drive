@@ -3,6 +3,7 @@ import { createPool, type Pool } from "mysql2/promise";
 
 import { env } from "~/env";
 import * as schema from "./schema";
+import { instrumentDrizzleClient } from "@kubiks/otel-drizzle";
 
 /**
  * Cache the database connection in development. This avoids creating a new connection on every HMR
@@ -30,3 +31,9 @@ conn.addListener("error", (err) => {
 });
 
 export const db = drizzle(conn, { schema });
+
+// eslint-disable-next-line @typescript-eslint/no-unsafe-call
+instrumentDrizzleClient(db, {
+  dbSystem: "mysql",
+  dbName: "drive-clone",
+});
