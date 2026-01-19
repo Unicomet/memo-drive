@@ -1,5 +1,5 @@
 "use server";
-import { auth, currentUser, clerkClient } from "@clerk/nextjs/server";
+import { auth, clerkClient, currentUser } from "@clerk/nextjs/server";
 import { DB_MUTATIONS, DB_QUERIES } from "./db/queries";
 import { db } from "./db";
 import {
@@ -7,16 +7,16 @@ import {
   items_roles_users,
   type folders_table,
 } from "./db/schema";
+import { resend } from "@upstash/qstash";
 import { and, eq } from "drizzle-orm";
 import { UTApi } from "uploadthing/server";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
-import { EmailTemplate } from "~/components/email-welcome";
-import { Resend } from "resend";
 import { hasPermission, ID_ROLES } from "~/lib/auth";
+import { client } from "./queue";
+import { env } from "~/env";
 
 const uploadThingsApi = new UTApi();
-const resend = new Resend(process.env.RESEND_API_KEY);
 const clerkClientBackend = await clerkClient();
 
 export async function deleteFolder(folderId: number) {
@@ -85,6 +85,49 @@ export async function deleteFile(fileId: number) {
   return { success: true, error: null };
 }
 
+export async function sendOnboardingEmail() {
+  const session = await currentUser();
+
+  if (!session) {
+    return { error: "Unauthorized" };
+  }
+
+  if (!session.emailAddresses[0]?.emailAddress) {
+    return { error: "Not found email" };
+  }
+  const emailAddress = session?.emailAddresses[0]?.emailAddress;
+
+  if (!session.firstName) {
+    return { error: "Not found first name" };
+  }
+  const firstName = session.firstName;
+
+  //This is the old way using our custom background job endpoint (slower)
+  // await client.publishJSON({
+  //   url: `${process.env.HOST}/api/background-jobs/send-email`,
+  //   body: {
+  //     type: "send-onboarding-email",
+  //     to: session.emailAddresses[0]?.emailAddress,
+  //     firstName,
+  //   },
+  // });
+
+  await client.publishJSON({
+    api: {
+      name: "email",
+      provider: resend({ token: env.RESEND_API_KEY }),
+    },
+    body: {
+      from: "Acme <onboarding@resend.dev>",
+      to: [emailAddress],
+      subject: `Welcome to Drive Clone, ${firstName}!`,
+      html: `<p>We give you a warm welcome, ${firstName}!</p>`,
+    },
+  });
+
+  return { success: true };
+}
+
 export async function createFolder(name: string, parent: number) {
   const session = await auth();
   if (!session.userId) {
@@ -112,33 +155,6 @@ export async function removeFolder(folderId: number) {
   const result = await DB_MUTATIONS.removeFolder(folderId);
   console.log(result);
 
-  return { success: true };
-}
-
-export async function sendOnboardingEmail() {
-  try {
-    const session = await currentUser();
-    const emailAddress = session?.emailAddresses[0]?.emailAddress;
-    if (!emailAddress) {
-      return { error: "Unauthorized" };
-    }
-
-    const firstName = session.firstName ?? "";
-
-    const { data, error } = await resend.emails.send({
-      from: "Acme <onboarding@resend.dev>",
-      to: [emailAddress],
-      subject: "Hello world",
-      react: EmailTemplate({ firstName }),
-    });
-
-    if (error) {
-      return { success: false, data: data };
-    }
-  } catch (error) {
-    console.log(error);
-    return { success: false };
-  }
   return { success: true };
 }
 

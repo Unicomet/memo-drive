@@ -3,6 +3,8 @@ import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { UploadThingError } from "uploadthing/server";
 import { z } from "zod";
 import { DB_MUTATIONS, DB_QUERIES } from "~/server/db/queries";
+import { ratelimit } from "~/server/rate-limiter";
+import { getSubtierForUser } from "~/server/subscriptions/actions/get-subtier";
 
 const f = createUploadthing();
 
@@ -26,7 +28,30 @@ export const ourFileRouter = {
       }),
     )
     // Set permissions and file types for this FileRoute
-    .middleware(async ({ input }) => {
+    .middleware(async ({ input, req }) => {
+      const ip =
+        req.headers.get("x-forwarded-for") ??
+        req.headers.get("x-real-ip") ??
+        "127.0.0.1";
+
+      const subtier = await getSubtierForUser();
+
+      if (subtier === "free") {
+        const { success } = await ratelimit.free.limit(ip);
+        if (!success) {
+          // eslint-disable-next-line @typescript-eslint/only-throw-error
+          throw new UploadThingError(
+            "Too many requests, free tier limit reached",
+          );
+        }
+      }
+
+      const { success } = await ratelimit.paid.limit(ip);
+      if (!success) {
+        // eslint-disable-next-line @typescript-eslint/only-throw-error
+        throw new UploadThingError("Too many requests, pro tier limit reached");
+      }
+
       // This code runs on your server before upload
       const user = await auth();
 
