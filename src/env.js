@@ -29,6 +29,9 @@ export const env = createEnv({
     QSTASH_TOKEN: z.string(),
     QSTASH_CURRENT_SIGNING_KEY: z.string(),
     QSTASH_NEXT_SIGNING_KEY: z.string(),
+    AXIOM_DOMAIN: z.string(),
+    AXIOM_API_TOKEN: z.string(),
+    AXIOM_DATASET_NAME: z.string(),
   },
 
   /**
@@ -77,9 +80,14 @@ export const env = createEnv({
     QSTASH_TOKEN: process.env.QSTASH_TOKEN,
     QSTASH_CURRENT_SIGNING_KEY: process.env.QSTASH_CURRENT_SIGNING_KEY,
     QSTASH_NEXT_SIGNING_KEY: process.env.QSTASH_NEXT_SIGNING_KEY,
-  } /** * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
+    AXIOM_DOMAIN: process.env.AXIOM_DOMAIN,
+    AXIOM_API_TOKEN: process.env.AXIOM_API_TOKEN,
+    AXIOM_DATASET_NAME: process.env.AXIOM_DATASET_NAME,
+  },
+  /**
+   * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
    * useful for Docker builds.
-   */,
+   */
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
   /**
    * Makes it so that empty strings are treated as undefined. `SOME_VAR: z.string()` and

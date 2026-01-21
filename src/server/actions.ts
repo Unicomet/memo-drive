@@ -15,9 +15,23 @@ import { revalidatePath } from "next/cache";
 import { hasPermission, ID_ROLES } from "~/lib/auth";
 import { client } from "./queue";
 import { env } from "~/env";
+import { getStripeSubByUserId } from "./subscriptions/store";
+import { trace } from "@opentelemetry/api";
 
 const uploadThingsApi = new UTApi();
 const clerkClientBackend = await clerkClient();
+
+// Initialize the wide event with request context
+const event: Record<string, unknown> = {
+  // request_id: ctx.get("requestId"),
+  timestamp: new Date().toISOString(),
+  // method: ctx.req.method,
+  // path: ctx.req.path,
+  service: process.env.SERVICE_NAME,
+  version: process.env.SERVICE_VERSION,
+  deployment_id: process.env.DEPLOYMENT_ID,
+  region: process.env.REGION,
+};
 
 export async function deleteFolder(folderId: number) {
   const session = await auth();
@@ -29,60 +43,89 @@ export async function deleteFolder(folderId: number) {
 }
 
 export async function deleteFile(fileId: number) {
-  const session = await auth();
-  if (!session.userId) {
-    return { success: false, error: "Unauthorized" };
-  }
+  return await trace
+    .getTracer("server-actions")
+    .startActiveSpan("deleteFile", async (span) => {
+      try {
+        const session = await auth();
+        if (!session.userId) {
+          return { success: false, error: "Unauthorized" };
+        }
 
-  const [fileData] = await db
-    .select({ ownerId: files_table.ownerId })
-    .from(files_table)
-    .where(eq(files_table.id, fileId));
+        // Add user context
+        const subscription = await getStripeSubByUserId(session.userId);
 
-  const isOwner = fileData?.ownerId === session.userId;
+        let subscriptionId: string | null = null;
+        if (subscription !== null && subscription.status !== "none") {
+          subscriptionId = subscription.subscriptionId;
+        }
 
-  const resource = {
-    id: fileId,
-    type: "file" as const,
-  };
+        span.setAttributes({
+          "user.id": session.userId,
+          "user.subscriptionId": subscriptionId ?? "",
+          // "user.account_age_days": daysSince(user.createdAt),
+          // "user.lifetime_value_cents": user.ltv,
+        });
 
-  const isAuthorized =
-    (await hasPermission(session.userId, resource, "delete")) || isOwner;
-  if (!isAuthorized) {
-    return { success: false, error: "You are not allowed to delete this file" };
-  }
+        const [fileData] = await db
+          .select({ ownerId: files_table.ownerId })
+          .from(files_table)
+          .where(eq(files_table.id, fileId));
 
-  const [file] = await db
-    .select()
-    .from(files_table)
-    .where(and(eq(files_table.id, fileId)));
+        const isOwner = fileData?.ownerId === session.userId;
 
-  if (!file) {
-    return { success: false, error: "File not found" };
-  }
+        const resource = {
+          id: fileId,
+          type: "file" as const,
+        };
 
-  const fileKey = file.url.replace(
-    "https://mdq5gee63i.ufs.sh/dashboard/folder/",
-    "",
-  );
+        const isAuthorized =
+          (await hasPermission(session.userId, resource, "delete")) || isOwner;
+        if (!isAuthorized) {
+          return {
+            success: false,
+            error: "You are not allowed to delete this file",
+          };
+        }
 
-  const utApiResult = await uploadThingsApi.deleteFiles(fileKey);
+        const [file] = await db
+          .select()
+          .from(files_table)
+          .where(and(eq(files_table.id, fileId)));
 
-  if (!utApiResult.success) {
-    return { success: false, error: "Failed to delete file from storage" };
-  }
+        if (!file) {
+          return { success: false, error: "File not found" };
+        }
 
-  console.log(utApiResult);
+        const fileKey = file.url.replace(
+          "https://mdq5gee63i.ufs.sh/dashboard/folder/",
+          "",
+        );
 
-  const deletedFileFromDb = await DB_QUERIES.deleteFileById(fileId);
+        const utApiResult = await uploadThingsApi.deleteFiles(fileKey);
 
-  console.log(deletedFileFromDb);
+        if (!utApiResult.success) {
+          return {
+            success: false,
+            error: "Failed to delete file from storage",
+          };
+        }
 
-  const c = await cookies();
+        console.log(utApiResult);
 
-  c.set("force-refresh", JSON.stringify(Math.random()));
+        const deletedFileFromDb = await DB_QUERIES.deleteFileById(fileId);
 
-  return { success: true, error: null };
+        console.log(deletedFileFromDb);
+
+        const c = await cookies();
+
+        c.set("force-refresh", JSON.stringify(Math.random()));
+
+        return { success: true, error: null };
+      } finally {
+        span.end();
+      }
+    });
 }
 
 export async function sendOnboardingEmail() {
