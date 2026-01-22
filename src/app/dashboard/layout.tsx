@@ -79,7 +79,9 @@ export default function RootLayout({
         </main>
       </div>
       <DialogShareFile />
-      <Toaster />
+      <Toaster
+        theme={resolvedTheme as "dark" | "light" | "system" | undefined}
+      />
     </ShareFileDialogProvider>
   );
 }
