@@ -36,8 +36,6 @@ export default async function GoogleDriveClone(params: {
     );
   }
 
-  console.log(subData);
-
   const subTier = await getSubtierForUser();
   if (subTier === "free") {
     return (

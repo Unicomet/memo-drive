@@ -36,7 +36,7 @@ export default function RootLayout({
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-8">
               <button>
-                <Link href="/" className="text-2xl font-semibold">
+                <Link href="/drive" className="text-2xl font-semibold">
                   Drive Clone
                 </Link>
               </button>
