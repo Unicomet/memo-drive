@@ -61,7 +61,7 @@ export default function DriveContent(props: {
         ))}
       </div>
       <UploadButton
-        className="mt-8"
+        className="ut-button:bg-foreground ut-button:ut-uploading:bg-muted-foreground ut-button:ut-readying:bg-muted-foreground mt-8"
         endpoint="imageUploader"
         onClientUploadComplete={(res) => {
           // Do something with the response
