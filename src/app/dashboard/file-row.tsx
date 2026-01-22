@@ -81,7 +81,7 @@ export function FileRow(props: { file: typeof files_table.$inferSelect }) {
             setShareDialogOpen(true);
           }}
         >
-          <Share2Icon className="h-5 w-5 text-white" />
+          <Share2Icon className="text-foreground h-5 w-5" />
         </Button>
         <Button
           variant="ghost"
