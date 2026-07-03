@@ -71,6 +71,7 @@ export async function hasPermission(
     .where(
       and(
         eq(items_roles_users.itemId, resource.id),
+        eq(items_roles_users.itemType, resource.type),
         eq(items_roles_users.userId, userId),
       ),
     );
