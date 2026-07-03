@@ -6,10 +6,10 @@ export default function HomePage() {
   return (
     <>
       <header className="mb-12 text-center">
-        <h1 className="mb-6 font-sans text-6xl font-bold text-balance text-white md:text-7xl">
+        <h1 className="mb-6 font-sans text-6xl font-bold text-balance text-neutral-900 md:text-7xl">
           Memo Drive
         </h1>
-        <p className="text-secondary mx-auto max-w-2xl text-xl leading-relaxed text-pretty md:text-2xl">
+        <p className="mx-auto max-w-2xl text-xl leading-relaxed text-pretty text-neutral-600 md:text-2xl">
           Your digital memory companion. Store, organize, and access your
           thoughts effortlessly.
         </p>
@@ -31,7 +31,7 @@ export default function HomePage() {
           <Button
             size="lg"
             type="submit"
-            className="bg-accent pointer text-accent-foreground hover:bg-accent/90 transform rounded-lg px-8 py-4 text-lg font-semibold shadow-lg transition-all duration-200 hover:scale-105 hover:shadow-xl"
+            className="transform rounded-lg bg-neutral-900 px-8 py-4 text-lg font-semibold text-white shadow-lg transition-all duration-200 hover:scale-105 hover:bg-neutral-800 hover:shadow-xl"
           >
             Get Started
           </Button>
@@ -39,7 +39,7 @@ export default function HomePage() {
       </main>
 
       {/* Footer */}
-      <footer className="text-muted-foreground text-center text-sm">
+      <footer className="text-center text-sm text-neutral-500">
         <p>&copy; 2024 Memo Drive. All rights reserved.</p>
       </footer>
     </>

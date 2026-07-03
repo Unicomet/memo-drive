@@ -66,6 +66,7 @@ export const items_roles_users = createTable("items_roles_users", {
     .primaryKey()
     .autoincrement(),
   itemId: bigint("item_id", { mode: "number", unsigned: true }).notNull(),
+  itemType: text("item_type", { enum: ["file", "folder"] }).notNull(),
   role: bigint("role_id", { mode: "number", unsigned: true }).notNull(),
   userId: text("user_id").notNull(),
 });

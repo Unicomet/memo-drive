@@ -5,7 +5,7 @@ import { db } from "./db";
 import {
   files_table,
   items_roles_users,
-  type folders_table,
+  folders_table,
 } from "./db/schema";
 import { resend } from "@upstash/qstash";
 import { and, eq } from "drizzle-orm";
@@ -21,25 +21,34 @@ import { trace } from "@opentelemetry/api";
 const uploadThingsApi = new UTApi();
 const clerkClientBackend = await clerkClient();
 
-// Initialize the wide event with request context
-const event: Record<string, unknown> = {
-  // request_id: ctx.get("requestId"),
-  timestamp: new Date().toISOString(),
-  // method: ctx.req.method,
-  // path: ctx.req.path,
-  service: process.env.SERVICE_NAME,
-  version: process.env.SERVICE_VERSION,
-  deployment_id: process.env.DEPLOYMENT_ID,
-  region: process.env.REGION,
-};
-
 export async function deleteFolder(folderId: number) {
   const session = await auth();
   if (!session.userId) {
     return { error: "Unauthorized" };
   }
 
+  const [folderData] = await db
+    .select({ ownerId: folders_table.ownerId })
+    .from(folders_table)
+    .where(eq(folders_table.id, folderId));
+
+  const isOwner = folderData?.ownerId === session.userId;
+
+  const resource = {
+    id: folderId,
+    type: "folder" as const,
+  };
+
+  const isAuthorized =
+    (await hasPermission(session.userId, resource, "delete")) || isOwner;
+
+  if (!isAuthorized) {
+    return { error: "You are not allowed to delete this folder" };
+  }
+
   await DB_QUERIES.deleteFolderById(folderId);
+  revalidatePath("/dashboard");
+  return { success: true };
 }
 
 export async function deleteFile(fileId: number) {
@@ -97,10 +106,10 @@ export async function deleteFile(fileId: number) {
           return { success: false, error: "File not found" };
         }
 
-        const fileKey = file.url.replace(
-          "https://mdq5gee63i.ufs.sh/dashboard/folder/",
-          "",
-        );
+        const fileKey = file.url.split("/").pop();
+        if (!fileKey) {
+          return { success: false, error: "Invalid file URL" };
+        }
 
         const utApiResult = await uploadThingsApi.deleteFiles(fileKey);
 
@@ -117,9 +126,7 @@ export async function deleteFile(fileId: number) {
 
         console.log(deletedFileFromDb);
 
-        const c = await cookies();
-
-        c.set("force-refresh", JSON.stringify(Math.random()));
+        revalidatePath("/dashboard");
 
         return { success: true, error: null };
       } finally {
@@ -230,6 +237,7 @@ export async function shareFileToUser(fileId: number, emailAddress: string) {
     .values({
       userId: userId,
       itemId: fileId,
+      itemType: "file",
       role: ID_ROLES.ADMIN, // Viewer role
     })
     .$returningId();

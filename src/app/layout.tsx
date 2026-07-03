@@ -17,6 +17,7 @@ import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
 import { extractRouterConfig } from "uploadthing/server";
 import { ourFileRouter } from "~/app/api/uploadthing/core";
 import { PostHogProvider } from "./_providers/posthog-provider";
+import { ThemeProvider } from "./_providers/theme-provider";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -34,12 +35,14 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <ClerkProvider>
-      <html lang="en" className={`${geist.variable}`}>
+      <html lang="en" className={`${geist.variable}`} suppressHydrationWarning>
         <body>
-          <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
-          <PostHogProvider>
-            <TRPCReactProvider>{children}</TRPCReactProvider>
-          </PostHogProvider>
+          <ThemeProvider>
+            <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
+            <PostHogProvider>
+              <TRPCReactProvider>{children}</TRPCReactProvider>
+            </PostHogProvider>
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>

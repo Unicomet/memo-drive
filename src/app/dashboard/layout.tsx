@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useTheme } from "next-themes";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Search, Moon, Sun } from "lucide-react";
@@ -14,24 +15,19 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [isDark, setIsDark] = useState(true);
+  const { resolvedTheme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    document.documentElement.classList.add("dark");
+    setMounted(true);
   }, []);
 
   const toggleTheme = () => {
-    const newIsDark = !isDark;
-    setIsDark(newIsDark);
-
-    if (newIsDark) {
-      document.documentElement.classList.remove("light");
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      document.documentElement.classList.add("light");
-    }
+    setTheme(resolvedTheme === "dark" ? "light" : "dark");
   };
+
+  // For theme toggle button - prevents hydration mismatch
+  const isDark = mounted ? resolvedTheme === "dark" : true;
 
   return (
     <ShareFileDialogProvider>
@@ -40,7 +36,7 @@ export default function RootLayout({
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-8">
               <button>
-                <Link href="/" className="text-2xl font-semibold">
+                <Link href="/drive" className="text-2xl font-semibold">
                   Drive Clone
                 </Link>
               </button>
@@ -83,7 +79,9 @@ export default function RootLayout({
         </main>
       </div>
       <DialogShareFile />
-      <Toaster theme="dark" />
+      <Toaster
+        theme={resolvedTheme as "dark" | "light" | "system" | undefined}
+      />
     </ShareFileDialogProvider>
   );
 }

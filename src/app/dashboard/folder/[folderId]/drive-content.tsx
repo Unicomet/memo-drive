@@ -30,7 +30,7 @@ export default function DriveContent(props: {
             className="mr-2 cursor-pointer font-medium hover:text-white"
             asChild
           >
-            <Link href="/dashboard/folder/1">My Drive</Link>
+            <Link href="/drive">My Drive</Link>
           </Button>
           {breadcrumbs.map((folder, index) => (
             <div key={index} className="flex items-center">
@@ -61,7 +61,7 @@ export default function DriveContent(props: {
         ))}
       </div>
       <UploadButton
-        className="mt-8"
+        className="ut-button:bg-foreground ut-button:ut-uploading:bg-muted-foreground ut-button:ut-readying:bg-muted-foreground mt-8"
         endpoint="imageUploader"
         onClientUploadComplete={(res) => {
           // Do something with the response

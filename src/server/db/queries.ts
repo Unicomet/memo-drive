@@ -139,12 +139,18 @@ export const DB_MUTATIONS = {
       }
 
       for (const { url } of urlFilesToDelete) {
-        const fileKey = url.replace("https://mdq5gee63i.ufs.sh/folder/", "");
+        const fileKey = url.split("/").pop();
+        if (!fileKey) {
+          console.error("Invalid file URL in database:", url);
+          continue;
+        }
+
         const utApiResult = await uploadThingsApi.deleteFiles(fileKey);
 
         if (!utApiResult.success) {
           console.error("Failed to delete file from uploadthing", url);
           tx.rollback();
+          return;
         }
       }
     });
