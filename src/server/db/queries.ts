@@ -5,7 +5,7 @@ import {
   files_table as filesSchema,
   folders_table as foldersSchema,
 } from "~/server/db/schema";
-import { eq, and, isNull, sql } from "drizzle-orm";
+import { eq, and, desc, isNull, sql } from "drizzle-orm";
 import { UTApi } from "uploadthing/server";
 
 const uploadThingsApi = new UTApi();
@@ -32,7 +32,8 @@ export const DB_QUERIES = {
     return await db
       .select()
       .from(filesSchema)
-      .where(eq(filesSchema.parent, folderId));
+      .where(eq(filesSchema.parent, folderId))
+      .orderBy(desc(filesSchema.updatedAt), desc(filesSchema.id));
   },
   getAllFoldersInFolder: async function (folderId: number) {
     return await db

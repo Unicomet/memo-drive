@@ -11,6 +11,9 @@ import { UploadButton } from "~/components/uploadthings";
 import { DialogCreateFolder } from "./_components/dialog-create-folder";
 import { DialogShareFile } from "../../file/[fileId]/_components/dialog-share-file";
 import { toast } from "sonner";
+import { useEffect } from "react";
+
+const REFRESH_INTERVAL_MS = 5000;
 
 export default function DriveContent(props: {
   files: (typeof files_table.$inferSelect)[];
@@ -20,6 +23,42 @@ export default function DriveContent(props: {
 }) {
   const navigate = useRouter();
   const { files, folders, folderParents: breadcrumbs } = props;
+
+  useEffect(() => {
+    let intervalId: number | undefined;
+
+    const stopRefreshing = () => {
+      if (intervalId !== undefined) {
+        window.clearInterval(intervalId);
+        intervalId = undefined;
+      }
+    };
+
+    const startRefreshing = () => {
+      stopRefreshing();
+      if (document.visibilityState === "visible") {
+        intervalId = window.setInterval(
+          () => navigate.refresh(),
+          REFRESH_INTERVAL_MS,
+        );
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        navigate.refresh();
+      }
+      startRefreshing();
+    };
+
+    startRefreshing();
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      stopRefreshing();
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [navigate]);
 
   return (
     <>
