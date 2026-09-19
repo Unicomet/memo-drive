@@ -7,9 +7,8 @@ import { FileRow, FolderRow } from "../../file-row";
 import type { files_table, folders_table } from "~/server/db/schema";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { UploadButton } from "~/components/uploadthings";
+import { UploadButton, UploadDropzone } from "~/components/uploadthings";
 import { DialogCreateFolder } from "./_components/dialog-create-folder";
-import { DialogShareFile } from "../../file/[fileId]/_components/dialog-share-file";
 import { toast } from "sonner";
 import { useEffect } from "react";
 
@@ -91,6 +90,27 @@ export default function DriveContent(props: {
         </nav>
         <DialogCreateFolder currentFolderId={props.currentFolderId} />
       </div>
+      <UploadDropzone
+        className="border-border bg-muted/30 text-foreground mt-0 w-full rounded-xl px-6 py-6"
+        appearance={{
+          label: "text-foreground hover:text-primary",
+          allowedContent: "text-muted-foreground",
+          button:
+            "bg-foreground data-[state=ready]:bg-foreground data-[state=uploading]:bg-muted-foreground",
+        }}
+        config={{ mode: "auto" }}
+        endpoint="imageUploader"
+        onClientUploadComplete={(res) => {
+          console.log("Files uploaded: ", res);
+          navigate.refresh();
+          toast.success("Upload complete!");
+        }}
+        onUploadError={(error: Error) => {
+          console.error("Failed to upload a file: ", error.message);
+          toast.error("Upload failed");
+        }}
+        input={{ folderId: props.currentFolderId }}
+      />
       <div className="flex flex-col gap-y-4">
         {files.map((file) => (
           <FileRow key={file.id} file={file} />
