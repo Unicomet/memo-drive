@@ -40,13 +40,15 @@ export const DB_QUERIES = {
     return await db
       .select()
       .from(filesSchema)
-      .where(eq(filesSchema.parent, folderId));
+      .where(eq(filesSchema.parent, folderId))
+      .orderBy(desc(filesSchema.updatedAt), desc(filesSchema.id));
   },
   getAllFoldersInFolder: async function (folderId: number) {
     return await db
       .select()
       .from(foldersSchema)
-      .where(eq(foldersSchema.parent, folderId));
+      .where(eq(foldersSchema.parent, folderId))
+      .orderBy(desc(foldersSchema.updatedAt), desc(foldersSchema.id));
   },
   getFolderById: async function (folderId: number) {
     const folder = await db
