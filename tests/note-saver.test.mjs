@@ -1,0 +1,98 @@
+import assert from "node:assert/strict";
+import { test } from "node:test";
+import { createNoteSaver } from "../src/app/dashboard/notes/note-saver.ts";
+
+const initial = { title: "Title", description: "Description" };
+
+test("unchanged notes do not write to the database", async () => {
+  let writes = 0;
+  const saver = createNoteSaver(
+    initial,
+    () => initial,
+    async () => {
+      writes++;
+      return true;
+    },
+    () => {},
+  );
+  assert.equal(await saver.save(), true);
+  assert.equal(writes, 0);
+});
+
+test("saving persists the title and description and marks them saved", async () => {
+  const values = { title: "New title", description: "New description" };
+  let saved;
+  const writes = [];
+  const saver = createNoteSaver(
+    initial,
+    () => values,
+    async (value) => {
+      writes.push(value);
+      return true;
+    },
+    (value) => {
+      saved = value;
+    },
+  );
+  assert.equal(saver.hasChanges(), true);
+  assert.equal(await saver.save(), true);
+  assert.deepEqual(writes, [values]);
+  assert.deepEqual(saved, values);
+  assert.equal(saver.hasChanges(), false);
+});
+
+test("edits during an outstanding save are serialized and the newest text wins", async () => {
+  let values = { title: "First edit", description: "First description" };
+  let release;
+  const writes = [];
+  const saver = createNoteSaver(
+    initial,
+    () => values,
+    async (value) => {
+      writes.push(value);
+      if (writes.length === 1)
+        await new Promise((resolve) => {
+          release = resolve;
+        });
+      return true;
+    },
+    () => {},
+  );
+  const first = saver.save();
+  values = { title: "Latest edit", description: "Latest description" };
+  const second = saver.save();
+  const third = saver.save();
+  assert.equal(writes.length, 1);
+  release();
+  assert.deepEqual(await Promise.all([first, second, third]), [
+    true,
+    true,
+    true,
+  ]);
+  assert.deepEqual(writes, [
+    { title: "First edit", description: "First description" },
+    values,
+  ]);
+  assert.equal(saver.hasChanges(), false);
+});
+
+test("failed saves preserve changes and allow retry", async () => {
+  const values = { title: "Unsaved", description: "Keep these edits" };
+  let succeed = false;
+  let savedCount = 0;
+  const saver = createNoteSaver(
+    initial,
+    () => values,
+    async () => succeed,
+    () => {
+      savedCount++;
+    },
+  );
+  assert.equal(await saver.save(), false);
+  assert.equal(saver.hasChanges(), true);
+  assert.equal(savedCount, 0);
+  succeed = true;
+  assert.equal(await saver.save(), true);
+  assert.equal(saver.hasChanges(), false);
+  assert.equal(savedCount, 1);
+});

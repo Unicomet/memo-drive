@@ -6,7 +6,7 @@ import { triggerSyncForUser } from "~/server/subscriptions/actions/update-subtie
 
 export const dynamic = "force-dynamic";
 
-export async function ConfirmStripeSessionComponent() {
+async function ConfirmStripeSessionComponent() {
   const session = await auth();
   if (!session.userId) {
     return <div>No user, please log in</div>;

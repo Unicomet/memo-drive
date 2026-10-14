@@ -10,6 +10,21 @@ export const createTable = singlestoreTableCreator(
   (name) => `drive_tutorial_${name}`,
 );
 
+export const notes_table = createTable(
+  "notes",
+  {
+    id: bigint("id", { mode: "number", unsigned: true })
+      .primaryKey()
+      .autoincrement(),
+    ownerId: text("owner_id").notNull(),
+    title: text("title").notNull(),
+    description: text("description").notNull(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  },
+  (t) => [index("notes_owner_index").on(t.ownerId)],
+);
+
 export const files_table = createTable(
   "files",
   {

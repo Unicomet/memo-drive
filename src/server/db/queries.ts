@@ -4,13 +4,21 @@ import { db } from "~/server/db";
 import {
   files_table as filesSchema,
   folders_table as foldersSchema,
+  notes_table as notesSchema,
 } from "~/server/db/schema";
-import { eq, and, isNull, sql } from "drizzle-orm";
+import { eq, and, desc, isNull, sql } from "drizzle-orm";
 import { UTApi } from "uploadthing/server";
 
 const uploadThingsApi = new UTApi();
 
 export const DB_QUERIES = {
+  getNotesForUser: async function (userId: string) {
+    return db
+      .select()
+      .from(notesSchema)
+      .where(eq(notesSchema.ownerId, userId))
+      .orderBy(desc(notesSchema.createdAt), desc(notesSchema.id));
+  },
   getAllParentsForFolder: async function (folderId: number) {
     const breadCrumbs = [];
     // let currentFolder = await db.select().from(foldersSchema).where(foldersSchema.Id) find((folder) => folder.id === currentFolderId);
@@ -65,6 +73,42 @@ export const DB_QUERIES = {
 };
 
 export const DB_MUTATIONS = {
+  createNote: async function (userId: string) {
+    const [created] = await db
+      .insert(notesSchema)
+      .values({
+        ownerId: userId,
+        title: "",
+        description: "",
+      })
+      .$returningId();
+    if (!created) throw new Error("Failed to create note");
+    const [note] = await db
+      .select()
+      .from(notesSchema)
+      .where(
+        and(eq(notesSchema.id, created.id), eq(notesSchema.ownerId, userId)),
+      );
+    if (!note) throw new Error("Failed to load new note");
+    return note;
+  },
+  updateNote: async function (
+    userId: string,
+    noteId: number,
+    values: Pick<typeof notesSchema.$inferInsert, "title" | "description">,
+  ) {
+    const [result] = await db
+      .update(notesSchema)
+      .set({ ...values, updatedAt: new Date() })
+      .where(and(eq(notesSchema.id, noteId), eq(notesSchema.ownerId, userId)));
+    return result.affectedRows > 0;
+  },
+  deleteNote: async function (userId: string, noteId: number) {
+    const [result] = await db
+      .delete(notesSchema)
+      .where(and(eq(notesSchema.id, noteId), eq(notesSchema.ownerId, userId)));
+    return result.affectedRows > 0;
+  },
   createFile: async function (file: typeof filesSchema.$inferInsert) {
     return await db.insert(filesSchema).values(file);
   },
