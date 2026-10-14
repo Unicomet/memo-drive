@@ -2,7 +2,10 @@ import { Button } from "../../components/ui/button";
 import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const { userId } = await auth();
+  if (userId) redirect("/drive");
+
   return (
     <>
       <header className="mb-12 text-center">
