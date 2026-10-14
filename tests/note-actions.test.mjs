@@ -231,7 +231,7 @@ test("invalid ids and oversized text are rejected before database writes", async
       await env.updateNote({
         id: 1,
         title: "x",
-        description: "y".repeat(10001),
+        description: "y".repeat(100001),
       })
     ).error,
   );

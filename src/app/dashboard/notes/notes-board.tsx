@@ -242,7 +242,7 @@ function NoteCard({
           <textarea
             aria-label="Note description"
             placeholder="Description"
-            maxLength={10000}
+            maxLength={100000}
             value={values.description}
             onChange={(event) =>
               changeValues({ ...values, description: event.target.value })

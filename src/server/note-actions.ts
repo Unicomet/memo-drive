@@ -9,7 +9,7 @@ const noteIdSchema = z.number().int().positive().safe();
 const noteSchema = z.object({
   id: noteIdSchema,
   title: z.string().max(200),
-  description: z.string().max(10000),
+  description: z.string().max(100000),
 });
 
 export async function createNote() {
@@ -32,7 +32,7 @@ export async function updateNote(input: unknown) {
   if (!parsed.success)
     return {
       error:
-        "Titles can have up to 200 characters and descriptions up to 10,000.",
+        "Titles can have up to 200 characters and descriptions up to 100,000.",
     };
   const { id, ...values } = parsed.data;
   try {
