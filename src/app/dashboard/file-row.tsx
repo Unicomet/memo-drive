@@ -9,6 +9,7 @@ import {
   FolderIcon,
   Trash2Icon,
   Share2Icon,
+  DownloadIcon,
 } from "lucide-react";
 import { cn } from "~/lib/utils";
 import type { files_table } from "~/server/db/schema";
@@ -70,6 +71,16 @@ export function FileRow(props: { file: typeof files_table.$inferSelect }) {
       </a>
       <div className="flex-1"></div>
       <div className="text-muted-foreground flex items-center space-x-8 text-sm">
+        <Button
+          size="icon"
+          className="border-border hover:bg-muted h-9 w-9 rounded-full border bg-transparent transition-colors duration-200"
+          aria-label={`Download ${file.name}`}
+          asChild
+        >
+          <a href={`/api/files/${file.id}/download`} download={file.name}>
+            <DownloadIcon className="text-foreground h-5 w-5" />
+          </a>
+        </Button>
         <Button
           size="icon"
           className="border-border hover:bg-muted h-9 w-9 rounded-full border bg-transparent transition-colors duration-200"
