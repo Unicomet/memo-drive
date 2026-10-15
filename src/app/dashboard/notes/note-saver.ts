@@ -41,5 +41,12 @@ export function createNoteSaver(
     return save();
   }
 
-  return { save, hasChanges };
+  function acceptRemote(values: NoteText) {
+    if (pending || hasChanges()) return false;
+    savedValues = values;
+    onSaved(values);
+    return true;
+  }
+
+  return { save, hasChanges, acceptRemote };
 }

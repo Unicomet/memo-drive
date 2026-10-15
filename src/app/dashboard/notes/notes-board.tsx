@@ -17,6 +17,9 @@ export default function NotesBoard({ initialNotes }: { initialNotes: Note[] }) {
   const [isCreating, startCreating] = useTransition();
   const saves = useRef(new Map<number, SaveNote>());
   const router = useRouter();
+  useEffect(() => {
+    setNotes(initialNotes);
+  }, [initialNotes]);
   const registerSave = useCallback((id: number, save: SaveNote) => {
     saves.current.set(id, save);
     return () => {
@@ -164,6 +167,15 @@ function NoteCard({
     if (deleting.current) return false;
     return saver.current!.save();
   }, []);
+
+  useEffect(() => {
+    const remoteValues = { title: note.title, description: note.description };
+    if (saver.current!.acceptRemote(remoteValues)) {
+      latestValues.current = remoteValues;
+      setValues(remoteValues);
+      setHasError(false);
+    }
+  }, [note.title, note.description]);
 
   useEffect(
     () => registerSave(note.id, saveNote),

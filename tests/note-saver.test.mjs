@@ -4,6 +4,48 @@ import { createNoteSaver } from "../src/app/dashboard/notes/note-saver.ts";
 
 const initial = { title: "Title", description: "Description" };
 
+test("polling accepts remote text without writing it back", async () => {
+  let values = initial;
+  let writes = 0;
+  const saver = createNoteSaver(
+    initial,
+    () => values,
+    async () => {
+      writes++;
+      return true;
+    },
+    () => {},
+  );
+  const remote = { title: "Remote title", description: "Remote description" };
+  assert.equal(saver.acceptRemote(remote), true);
+  values = remote;
+  assert.equal(await saver.save(), true);
+  assert.equal(writes, 0);
+});
+
+test("polling preserves unsaved edits and outstanding saves", async () => {
+  let values = { ...initial, title: "Local edit" };
+  let release;
+  const saver = createNoteSaver(
+    initial,
+    () => values,
+    async () => {
+      await new Promise((resolve) => {
+        release = resolve;
+      });
+      return true;
+    },
+    () => {},
+  );
+  assert.equal(saver.acceptRemote(initial), false);
+  const saving = saver.save();
+  values = initial;
+  assert.equal(saver.acceptRemote(initial), false);
+  values = { ...initial, title: "Local edit" };
+  release();
+  await saving;
+});
+
 test("unchanged notes do not write to the database", async () => {
   let writes = 0;
   const saver = createNoteSaver(

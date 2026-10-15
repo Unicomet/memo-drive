@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -19,6 +19,22 @@ export default function RootLayout({
   const isNotesPage = usePathname() === "/dashboard/notes";
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    function refresh() {
+      if (document.visibilityState === "visible") router.refresh();
+    }
+
+    const interval = window.setInterval(refresh, 3000);
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", refresh);
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", refresh);
+    };
+  }, [router]);
 
   useEffect(() => {
     setMounted(true);
