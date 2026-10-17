@@ -10,6 +10,20 @@ const f = createUploadthing();
 
 // FileRouter for your app, can contain multiple FileRoutes
 export const ourFileRouter = {
+  noteImages: f({ image: { maxFileSize: "8MB", maxFileCount: 10 } })
+    .input(z.object({ noteId: z.number().int().positive().safe() }))
+    .middleware(async ({ input }) => {
+      const { userId } = await auth();
+      // eslint-disable-next-line @typescript-eslint/only-throw-error
+      if (!userId) throw new UploadThingError("Unauthorized");
+      const notes = await DB_QUERIES.getNotesForUser(userId);
+      if (!notes.some((note) => note.id === input.noteId)) {
+        // eslint-disable-next-line @typescript-eslint/only-throw-error
+        throw new UploadThingError("Note not found");
+      }
+      return { userId };
+    })
+    .onUploadComplete(({ file }) => ({ url: file.ufsUrl })),
   // Define as many FileRoutes as you like, each with a unique routeSlug
   imageUploader: f({
     blob: {

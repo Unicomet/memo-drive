@@ -138,3 +138,22 @@ test("failed saves preserve changes and allow retry", async () => {
   assert.equal(saver.hasChanges(), false);
   assert.equal(savedCount, 1);
 });
+
+test("image-only changes save and remote refresh cannot overwrite unsaved attachments", async () => {
+  const original = { ...initial, images: "[]" };
+  let values = { ...original, images: '["https://example.com/photo.png"]' };
+  let persisted;
+  const saver = createNoteSaver(
+    original,
+    () => values,
+    async (snapshot) => {
+      persisted = snapshot;
+      return true;
+    },
+    () => {},
+  );
+  assert.equal(saver.acceptRemote(original), false);
+  assert.equal(await saver.save(), true);
+  assert.equal(persisted.images, values.images);
+  assert.equal(saver.hasChanges(), false);
+});

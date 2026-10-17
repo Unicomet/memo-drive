@@ -19,6 +19,7 @@ export const notes_table = createTable(
     ownerId: text("owner_id").notNull(),
     title: text("title").notNull(),
     description: text("description").notNull(),
+    images: text("images").notNull().default("[]"),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },

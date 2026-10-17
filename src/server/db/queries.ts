@@ -97,7 +97,10 @@ export const DB_MUTATIONS = {
   updateNote: async function (
     userId: string,
     noteId: number,
-    values: Pick<typeof notesSchema.$inferInsert, "title" | "description">,
+    values: Pick<
+      typeof notesSchema.$inferInsert,
+      "title" | "description" | "images"
+    >,
   ) {
     const [result] = await db
       .update(notesSchema)

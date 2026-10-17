@@ -10,6 +10,25 @@ const noteSchema = z.object({
   id: noteIdSchema,
   title: z.string().max(200),
   description: z.string().max(100000),
+  images: z
+    .string()
+    .max(20000)
+    .refine((value) => {
+      try {
+        return z
+          .array(
+            z
+              .string()
+              .url()
+              .refine((url) => new URL(url).protocol === "https:"),
+          )
+          .max(10)
+          .safeParse(JSON.parse(value)).success;
+      } catch {
+        return false;
+      }
+    }, "Invalid images")
+    .optional(),
 });
 
 export async function createNote() {

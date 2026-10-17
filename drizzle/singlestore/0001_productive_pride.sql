@@ -1,0 +1,1 @@
+ALTER TABLE `drive_tutorial_notes` ADD `images` text DEFAULT '[]' NOT NULL;

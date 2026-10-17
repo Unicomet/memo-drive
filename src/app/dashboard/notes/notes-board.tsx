@@ -2,12 +2,16 @@
 
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Save, StickyNote, Trash2 } from "lucide-react";
+import { ImagePlus, Plus, Save, StickyNote, Trash2, X } from "lucide-react";
+import { generateReactHelpers } from "@uploadthing/react";
+import type { OurFileRouter } from "~/app/api/uploadthing/core";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import { createNote, deleteNote, updateNote } from "~/server/note-actions";
 import type { notes_table } from "~/server/db/schema";
 import { createNoteSaver } from "./note-saver";
+
+const { useUploadThing } = generateReactHelpers<OurFileRouter>();
 
 type Note = typeof notes_table.$inferSelect;
 type SaveNote = () => Promise<boolean>;
@@ -102,7 +106,7 @@ export default function NotesBoard({ initialNotes }: { initialNotes: Note[] }) {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 items-start gap-6 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
           {notes.map((note) => (
             <NoteCard
               key={note.id}
@@ -133,14 +137,19 @@ function NoteCard({
   const [values, setValues] = useState({
     title: note.title,
     description: note.description,
+    images: note.images,
   });
+  const fileInput = useRef<HTMLInputElement>(null);
+  const { startUpload, isUploading } = useUploadThing("noteImages");
   const latestValues = useRef(values);
   const [savedValues, setSavedValues] = useState(values);
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [hasError, setHasError] = useState(false);
   const deleting = useRef(false);
-  const saver = useRef<ReturnType<typeof createNoteSaver> | null>(null);
+  const saver = useRef<ReturnType<
+    typeof createNoteSaver<typeof values>
+  > | null>(null);
   saver.current ??= createNoteSaver(
     values,
     () => latestValues.current,
@@ -169,13 +178,17 @@ function NoteCard({
   }, []);
 
   useEffect(() => {
-    const remoteValues = { title: note.title, description: note.description };
+    const remoteValues = {
+      title: note.title,
+      description: note.description,
+      images: note.images,
+    };
     if (saver.current!.acceptRemote(remoteValues)) {
       latestValues.current = remoteValues;
       setValues(remoteValues);
       setHasError(false);
     }
-  }, [note.title, note.description]);
+  }, [note.title, note.description, note.images]);
 
   useEffect(
     () => registerSave(note.id, saveNote),
@@ -205,6 +218,38 @@ function NoteCard({
     setHasError(false);
   }
 
+  async function attachImages(files: File[]) {
+    const currentImages = JSON.parse(latestValues.current.images) as string[];
+    if (currentImages.length + files.length > 10) {
+      toast.error("You can attach up to 10 images per note.");
+      return;
+    }
+    if (
+      files.some(
+        (file) =>
+          !file.type.startsWith("image/") || file.size > 8 * 1024 * 1024,
+      )
+    ) {
+      toast.error("Choose images up to 8 MB each.");
+      return;
+    }
+    try {
+      const uploaded = await startUpload(files, { noteId: note.id });
+      if (!uploaded) throw new Error("Upload failed");
+      const latest = latestValues.current;
+      changeValues({
+        ...latest,
+        images: JSON.stringify([
+          ...(JSON.parse(latest.images) as string[]),
+          ...uploaded.map((file) => file.serverData.url),
+        ]),
+      });
+      await saveNote();
+    } catch {
+      toast.error("Could not upload images. Please try again.");
+    }
+  }
+
   async function removeNote() {
     if (!window.confirm("Delete this note? This cannot be undone.")) return;
     deleting.current = true;
@@ -225,11 +270,12 @@ function NoteCard({
 
   const hasChanges =
     values.title !== savedValues.title ||
-    values.description !== savedValues.description;
+    values.description !== savedValues.description ||
+    values.images !== savedValues.images;
   return (
     <article
       aria-label={values.title || "Untitled note"}
-      className="rounded-lg border border-amber-300 bg-amber-100 p-5 text-slate-900 shadow-md"
+      className="rounded-lg border border-amber-300 bg-amber-100 p-6 text-slate-900 shadow-md sm:p-8"
       onBlur={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget)) void saveNote();
       }}
@@ -240,7 +286,10 @@ function NoteCard({
           void saveNote();
         }}
       >
-        <fieldset disabled={isDeleting} className="min-w-0 space-y-4">
+        <fieldset
+          disabled={isDeleting || isUploading}
+          className="min-w-0 space-y-4"
+        >
           <input
             aria-label="Note title"
             placeholder="Title"
@@ -249,7 +298,7 @@ function NoteCard({
             onChange={(event) =>
               changeValues({ ...values, title: event.target.value })
             }
-            className="w-full rounded-sm bg-transparent text-lg font-semibold outline-none placeholder:text-slate-600 focus-visible:ring-2 focus-visible:ring-slate-600"
+            className="w-full rounded-sm bg-transparent text-xl font-semibold outline-none placeholder:text-slate-600 focus-visible:ring-2 focus-visible:ring-slate-600"
           />
           <textarea
             aria-label="Note description"
@@ -259,19 +308,91 @@ function NoteCard({
             onChange={(event) =>
               changeValues({ ...values, description: event.target.value })
             }
-            className="min-h-44 w-full resize-y rounded-sm bg-transparent text-sm leading-relaxed outline-none placeholder:text-slate-600 focus-visible:ring-2 focus-visible:ring-slate-600"
+            className="min-h-64 w-full resize-y rounded-sm bg-transparent text-base leading-relaxed outline-none placeholder:text-slate-600 focus-visible:ring-2 focus-visible:ring-slate-600"
           />
+          <div className="space-y-4">
+            {(JSON.parse(values.images) as string[]).map((url, index) => (
+              <div
+                key={url + index}
+                className="relative overflow-hidden rounded-lg border border-amber-300"
+              >
+                <a
+                  href={url}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={`Open image ${index + 1}`}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={url}
+                    alt={`Note attachment ${index + 1}`}
+                    className="max-h-96 w-full object-contain"
+                  />
+                </a>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="icon"
+                  aria-label={`Remove image ${index + 1}`}
+                  className="absolute top-2 right-2"
+                  onClick={() =>
+                    changeValues({
+                      ...values,
+                      images: JSON.stringify(
+                        (JSON.parse(values.images) as string[]).filter(
+                          (_, i) => i !== index,
+                        ),
+                      ),
+                    })
+                  }
+                >
+                  <X />
+                </Button>
+              </div>
+            ))}
+            <input
+              ref={fileInput}
+              type="file"
+              accept="image/*"
+              multiple
+              className="hidden"
+              aria-label="Attach images"
+              onChange={(event) => {
+                const files = Array.from(event.target.files ?? []);
+                event.target.value = "";
+                if (files.length) void attachImages(files);
+              }}
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              disabled={
+                isUploading ||
+                (JSON.parse(values.images) as string[]).length >= 10
+              }
+              onClick={() => fileInput.current?.click()}
+              className="text-slate-700 hover:bg-black/10"
+            >
+              <ImagePlus />
+              {isUploading ? "Uploading…" : "Add images"}
+            </Button>
+            <p className="text-xs text-slate-600">
+              Up to 10 images · 8 MB each
+            </p>
+          </div>
           <div className="flex items-center justify-between gap-2 border-t border-slate-900/10 pt-3">
             <span role="status" className="text-xs text-slate-600">
-              {isDeleting
-                ? "Deleting…"
-                : isSaving
-                  ? "Saving…"
-                  : hasError
-                    ? "Save failed — retry"
-                    : hasChanges
-                      ? "Unsaved changes"
-                      : "Saved"}
+              {isUploading
+                ? "Uploading…"
+                : isDeleting
+                  ? "Deleting…"
+                  : isSaving
+                    ? "Saving…"
+                    : hasError
+                      ? "Save failed — retry"
+                      : hasChanges
+                        ? "Unsaved changes"
+                        : "Saved"}
             </span>
             <div className="flex items-center gap-1">
               <Button

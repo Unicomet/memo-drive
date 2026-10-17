@@ -24,6 +24,7 @@ function loadTypeScript(path, mocks) {
     require: (name) => (name in mocks ? mocks[name] : require(name)),
     console: { error() {} },
     Date,
+    URL,
   });
   return module.exports;
 }
@@ -236,4 +237,32 @@ test("invalid ids and oversized text are rejected before database writes", async
     ).error,
   );
   assert.equal(env.predicates.length, 0);
+});
+
+test("image attachments persist and unsafe or oversized image lists are rejected", async () => {
+  const env = setup();
+  const images = JSON.stringify(["https://example.com/photo.png"]);
+  assert.equal(
+    (await env.updateNote({ id: 1, title: "Photo", description: "", images }))
+      .success,
+    true,
+  );
+  assert.equal(env.rows[0].images, images);
+  for (const invalid of [
+    "invalid",
+    JSON.stringify(["javascript:alert(1)"]),
+    JSON.stringify(Array(11).fill("https://example.com/a.png")),
+  ]) {
+    assert.ok(
+      (
+        await env.updateNote({
+          id: 1,
+          title: "",
+          description: "",
+          images: invalid,
+        })
+      ).error,
+    );
+  }
+  assert.equal(env.rows[0].images, images);
 });

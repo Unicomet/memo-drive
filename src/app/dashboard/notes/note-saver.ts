@@ -1,14 +1,15 @@
 export interface NoteText {
   title: string;
   description: string;
+  images?: string;
 }
 
 // Serialize writes so an older request cannot overwrite newer edits.
-export function createNoteSaver(
-  initialValues: NoteText,
-  getValues: () => NoteText,
-  persist: (values: NoteText) => Promise<boolean>,
-  onSaved: (values: NoteText) => void,
+export function createNoteSaver<T extends NoteText>(
+  initialValues: T,
+  getValues: () => T,
+  persist: (values: T) => Promise<boolean>,
+  onSaved: (values: T) => void,
 ) {
   let savedValues = initialValues;
   let pending: Promise<boolean> | null = null;
@@ -17,7 +18,8 @@ export function createNoteSaver(
     const values = getValues();
     return (
       values.title !== savedValues.title ||
-      values.description !== savedValues.description
+      values.description !== savedValues.description ||
+      values.images !== savedValues.images
     );
   }
 
@@ -41,7 +43,7 @@ export function createNoteSaver(
     return save();
   }
 
-  function acceptRemote(values: NoteText) {
+  function acceptRemote(values: T) {
     if (pending || hasChanges()) return false;
     savedValues = values;
     onSaved(values);

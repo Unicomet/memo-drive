@@ -8,6 +8,13 @@
       "when": 1792002051796,
       "tag": "0000_add_notes",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "1",
+      "when": 1792201818027,
+      "tag": "0001_productive_pride",
+      "breakpoints": true
     }
   ]
 }
