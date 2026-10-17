@@ -42,7 +42,12 @@ const getFormattedDate = (date: Date) => {
   return date.toLocaleDateString();
 };
 
-export function FileRow(props: { file: typeof files_table.$inferSelect }) {
+export function FileRow(props: {
+  file: typeof files_table.$inferSelect;
+  selected?: boolean;
+  onSelectionChange?: (selected: boolean) => void;
+  selectionDisabled?: boolean;
+}) {
   const { file } = props;
   const {
     isOpen: isShareDialogOpen,
@@ -56,6 +61,16 @@ export function FileRow(props: { file: typeof files_table.$inferSelect }) {
       key={file.id}
       className="hover:border-gray-100m group flex cursor-pointer items-center rounded-xl border-b p-5 transition-all duration-200"
     >
+      {props.onSelectionChange && (
+        <input
+          type="checkbox"
+          className="mr-4 h-4 w-4 shrink-0"
+          aria-label={`Select ${file.name}`}
+          checked={props.selected ?? false}
+          disabled={props.selectionDisabled}
+          onChange={(event) => props.onSelectionChange?.(event.target.checked)}
+        />
+      )}
       <a href={file.url} target="_blank" className="flex flex-1">
         <div className="mr-5 flex items-center gap-6">
           <IconComponent

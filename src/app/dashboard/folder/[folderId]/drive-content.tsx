@@ -1,7 +1,9 @@
 "use client";
 
 import { Button } from "~/components/ui/button";
-import { ChevronRight } from "lucide-react";
+import { useState } from "react";
+import { downloadImages } from "~/lib/download-images";
+import { ChevronRight, DownloadIcon } from "lucide-react";
 import { cn } from "~/lib/utils";
 import { FileRow, FolderRow } from "../../file-row";
 import type { files_table, folders_table } from "~/server/db/schema";
@@ -19,6 +21,25 @@ export default function DriveContent(props: {
 }) {
   const navigate = useRouter();
   const { files, folders, folderParents: breadcrumbs } = props;
+
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const images = files.filter(
+    (file) => file.fileType === "image" || file.fileType.startsWith("image/"),
+  );
+  const selectedImages = images.filter((file) => selectedIds.includes(file.id));
+
+  async function handleDownload() {
+    setIsDownloading(true);
+    try {
+      await downloadImages(selectedImages.length ? selectedImages : images);
+      toast.success("Images downloaded");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Download failed");
+    } finally {
+      setIsDownloading(false);
+    }
+  }
 
   return (
     <>
@@ -72,9 +93,49 @@ export default function DriveContent(props: {
         }}
         input={{ folderId: props.currentFolderId }}
       />
+      {images.length > 0 && (
+        <div className="my-4 flex flex-wrap items-center gap-4">
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={selectedImages.length === images.length}
+              disabled={isDownloading}
+              onChange={(event) =>
+                setSelectedIds(
+                  event.target.checked ? images.map((file) => file.id) : [],
+                )
+              }
+            />
+            Select all images ({images.length})
+          </label>
+          <Button onClick={handleDownload} disabled={isDownloading}>
+            <DownloadIcon className="mr-2 h-4 w-4" />
+            {isDownloading
+              ? "Preparing download…"
+              : selectedImages.length
+                ? `Download selected (${selectedImages.length})`
+                : `Download all images (${images.length})`}
+          </Button>
+        </div>
+      )}
       <div className="flex flex-col gap-y-4">
         {files.map((file) => (
-          <FileRow key={file.id} file={file} />
+          <FileRow
+            key={file.id}
+            file={file}
+            selected={selectedIds.includes(file.id)}
+            selectionDisabled={isDownloading}
+            onSelectionChange={
+              images.some((image) => image.id === file.id)
+                ? (selected) =>
+                    setSelectedIds((ids) =>
+                      selected
+                        ? [...ids, file.id]
+                        : ids.filter((id) => id !== file.id),
+                    )
+                : undefined
+            }
+          />
         ))}
         {folders.map((folder) => (
           <FolderRow key={folder.id} folder={folder} />

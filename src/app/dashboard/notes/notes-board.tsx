@@ -2,7 +2,16 @@
 
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { ImagePlus, Plus, Save, StickyNote, Trash2, X } from "lucide-react";
+import { downloadImage, downloadImages } from "~/lib/download-images";
+import {
+  Download,
+  ImagePlus,
+  Plus,
+  Save,
+  StickyNote,
+  Trash2,
+  X,
+} from "lucide-react";
 import { generateReactHelpers } from "@uploadthing/react";
 import type { OurFileRouter } from "~/app/api/uploadthing/core";
 import { toast } from "sonner";
@@ -143,6 +152,25 @@ function NoteCard({
   const { startUpload, isUploading } = useUploadThing("noteImages");
   const latestValues = useRef(values);
   const [savedValues, setSavedValues] = useState(values);
+  const [isDownloading, setIsDownloading] = useState(false);
+  async function handleDownload(url?: string) {
+    setIsDownloading(true);
+    try {
+      if (url) await downloadImage(url);
+      else
+        await downloadImages(
+          (JSON.parse(values.images) as string[]).map((imageUrl, index) => ({
+            id: index + 1,
+            name: new URL(imageUrl).pathname.split("/").pop() || "image",
+            url: imageUrl,
+          })),
+        );
+    } catch {
+      toast.error("Could not download images. Please try again.");
+    } finally {
+      setIsDownloading(false);
+    }
+  }
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -322,6 +350,17 @@ function NoteCard({
             className="min-h-64 w-full resize-y rounded-sm bg-transparent text-base leading-relaxed outline-none placeholder:text-slate-600 focus-visible:ring-2 focus-visible:ring-slate-600"
           />
           <div className="space-y-4">
+            {(JSON.parse(values.images) as string[]).length > 0 && (
+              <Button
+                type="button"
+                variant="secondary"
+                disabled={isDownloading}
+                onClick={() => handleDownload()}
+              >
+                <Download />
+                {isDownloading ? "Preparing download…" : "Download all images"}
+              </Button>
+            )}
             {(JSON.parse(values.images) as string[]).map((url, index) => (
               <div
                 key={url + index}
@@ -340,6 +379,17 @@ function NoteCard({
                     className="max-h-96 w-full object-contain"
                   />
                 </a>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="icon"
+                  aria-label={`Download image ${index + 1}`}
+                  className="absolute top-2 right-14"
+                  disabled={isDownloading}
+                  onClick={() => handleDownload(url)}
+                >
+                  <Download />
+                </Button>
                 <Button
                   type="button"
                   variant="secondary"
