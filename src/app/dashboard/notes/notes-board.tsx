@@ -275,6 +275,17 @@ function NoteCard({
   return (
     <article
       aria-label={values.title || "Untitled note"}
+      onPaste={(event) => {
+        const files = Array.from(event.clipboardData.items)
+          .filter(
+            (item) => item.kind === "file" && item.type.startsWith("image/"),
+          )
+          .map((item) => item.getAsFile())
+          .filter((file): file is File => file !== null);
+        if (files.length === 0) return;
+        event.preventDefault();
+        if (!isUploading && !isDeleting) void attachImages(files);
+      }}
       className="rounded-lg border border-amber-300 bg-amber-100 p-6 text-slate-900 shadow-md sm:p-8"
       onBlur={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget)) void saveNote();
@@ -377,7 +388,7 @@ function NoteCard({
               {isUploading ? "Uploading…" : "Add images"}
             </Button>
             <p className="text-xs text-slate-600">
-              Up to 10 images · 8 MB each
+              Paste images with Ctrl+V / Cmd+V · Up to 10 images · 8 MB each
             </p>
           </div>
           <div className="flex items-center justify-between gap-2 border-t border-slate-900/10 pt-3">
