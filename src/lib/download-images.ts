@@ -50,7 +50,7 @@ export async function downloadImage(url: string) {
   const objectUrl = URL.createObjectURL(await response.blob());
   const link = document.createElement("a");
   link.href = objectUrl;
-  link.download = new URL(url).pathname.split("/").pop() || "image";
+  link.download = new URL(url).pathname.split("/").pop() ?? "image";
   document.body.appendChild(link);
   link.click();
   link.remove();

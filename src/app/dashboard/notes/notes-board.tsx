@@ -161,7 +161,7 @@ function NoteCard({
         await downloadImages(
           (JSON.parse(values.images) as string[]).map((imageUrl, index) => ({
             id: index + 1,
-            name: new URL(imageUrl).pathname.split("/").pop() || "image",
+            name: new URL(imageUrl).pathname.split("/").pop() ?? "image",
             url: imageUrl,
           })),
         );
