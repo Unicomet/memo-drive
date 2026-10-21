@@ -1,0 +1,3 @@
+interface:
+  display_name: "Upload to Drive Clone"
+  short_description: "Upload local files with the Memo Drive CLI"
