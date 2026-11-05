@@ -9,6 +9,7 @@ This directory is the maintained source for verifying Memo Drive. Read this inde
 - Drive that `url` only. `owned=false` means a Next server was already using this checkout. Leave it up.
 - The account is the live Clerk user in `~/.config/memo-drive/account.json`. SingleStore and UploadThing are shared. One mutating run at a time.
 - Name every fixture `verify-…`. A notes fixture is removed with `note-delete`. A file fixture is removed with the browser Delete control, which also deletes the stored object.
+- CLI entries need `cli/memo.mjs`. The skill's Drive section says what to do when it is absent.
 
 ## Driving conventions
 

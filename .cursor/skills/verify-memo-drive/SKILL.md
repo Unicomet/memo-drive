@@ -61,7 +61,7 @@ Browser rules:
 - Accept the confirm dialog `Delete this note? This cannot be undone.` only for a note titled `verify-…`.
 - File and folder delete buttons have no confirm. Delete only a row whose name starts with `verify-`.
 
-CLI:
+CLI, when `cli/memo.mjs` is in the checkout. If that file is absent, every CLI entry is unreachable:
 
 ```bash
 node cli/memo.mjs whoami
