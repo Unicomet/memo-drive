@@ -1,0 +1,426 @@
+{
+  "project": "memo-drive",
+  "measurement": {
+    "from": "2026-10-01T00:00:00.000Z",
+    "to_exclusive": "2026-11-06T18:00:00.000Z",
+    "queried_at": "2026-11-06T18:45:15.728Z",
+    "timezone": "UTC",
+    "byte_unit": "decimal bytes; GB = 1000000000 bytes",
+    "daily_data_source": "POST https://api.vercel.com/v1/usage-metrics/query (dashboard API)",
+    "metrics": [
+      "fast_origin_transfer",
+      "function_invocations",
+      "edge_requests"
+    ],
+    "project_filter_applied": true,
+    "partial_final_day": true
+  },
+  "deployments": [
+    {
+      "commit": "5fac0aec61002fb162b1522909a497f165161417",
+      "created_at_utc": "2026-10-15T05:31:43.958Z",
+      "change": "Introduce dashboard refresh every 3000 ms and on focus/visibility change"
+    },
+    {
+      "commit": "9a9d426e76a171472e42501d6c46cc240efa3696",
+      "created_at_utc": "2026-10-17T21:14:11.822Z",
+      "change": "Reduce dashboard refresh interval from 3000 ms to 1000 ms"
+    }
+  ],
+  "daily": [
+    {
+      "date": "2026-10-01",
+      "origin_out_bytes": 16737,
+      "origin_in_bytes": 3356,
+      "page_function_invocations": 0,
+      "middleware_invocations": 1,
+      "cdn_requests": 2
+    },
+    {
+      "date": "2026-10-02",
+      "origin_out_bytes": 0,
+      "origin_in_bytes": 0,
+      "page_function_invocations": 0,
+      "middleware_invocations": 0,
+      "cdn_requests": 0
+    },
+    {
+      "date": "2026-10-03",
+      "origin_out_bytes": 852613,
+      "origin_in_bytes": 1261704,
+      "page_function_invocations": 100,
+      "middleware_invocations": 183,
+      "cdn_requests": 251
+    },
+    {
+      "date": "2026-10-04",
+      "origin_out_bytes": 0,
+      "origin_in_bytes": 0,
+      "page_function_invocations": 0,
+      "middleware_invocations": 0,
+      "cdn_requests": 0
+    },
+    {
+      "date": "2026-10-05",
+      "origin_out_bytes": 183999,
+      "origin_in_bytes": 243868,
+      "page_function_invocations": 21,
+      "middleware_invocations": 47,
+      "cdn_requests": 67
+    },
+    {
+      "date": "2026-10-06",
+      "origin_out_bytes": 38656,
+      "origin_in_bytes": 21353,
+      "page_function_invocations": 2,
+      "middleware_invocations": 3,
+      "cdn_requests": 5
+    },
+    {
+      "date": "2026-10-07",
+      "origin_out_bytes": 6472,
+      "origin_in_bytes": 20620,
+      "page_function_invocations": 0,
+      "middleware_invocations": 4,
+      "cdn_requests": 4
+    },
+    {
+      "date": "2026-10-08",
+      "origin_out_bytes": 551466,
+      "origin_in_bytes": 1037708,
+      "page_function_invocations": 67,
+      "middleware_invocations": 169,
+      "cdn_requests": 269
+    },
+    {
+      "date": "2026-10-09",
+      "origin_out_bytes": 8766,
+      "origin_in_bytes": 32216,
+      "page_function_invocations": 2,
+      "middleware_invocations": 5,
+      "cdn_requests": 5
+    },
+    {
+      "date": "2026-10-10",
+      "origin_out_bytes": 3236,
+      "origin_in_bytes": 10320,
+      "page_function_invocations": 0,
+      "middleware_invocations": 2,
+      "cdn_requests": 2
+    },
+    {
+      "date": "2026-10-11",
+      "origin_out_bytes": 36436,
+      "origin_in_bytes": 89947,
+      "page_function_invocations": 3,
+      "middleware_invocations": 16,
+      "cdn_requests": 16
+    },
+    {
+      "date": "2026-10-12",
+      "origin_out_bytes": 184238,
+      "origin_in_bytes": 373920,
+      "page_function_invocations": 26,
+      "middleware_invocations": 59,
+      "cdn_requests": 71
+    },
+    {
+      "date": "2026-10-13",
+      "origin_out_bytes": 364487,
+      "origin_in_bytes": 446517,
+      "page_function_invocations": 34,
+      "middleware_invocations": 83,
+      "cdn_requests": 140
+    },
+    {
+      "date": "2026-10-14",
+      "origin_out_bytes": 4834295,
+      "origin_in_bytes": 5113679,
+      "page_function_invocations": 282,
+      "middleware_invocations": 740,
+      "cdn_requests": 1275
+    },
+    {
+      "date": "2026-10-15",
+      "origin_out_bytes": 1080379147,
+      "origin_in_bytes": 174808301,
+      "page_function_invocations": 22051,
+      "middleware_invocations": 21399,
+      "cdn_requests": 21493
+    },
+    {
+      "date": "2026-10-16",
+      "origin_out_bytes": 0,
+      "origin_in_bytes": 0,
+      "page_function_invocations": 0,
+      "middleware_invocations": 0,
+      "cdn_requests": 0
+    },
+    {
+      "date": "2026-10-17",
+      "origin_out_bytes": 962746896,
+      "origin_in_bytes": 195825680,
+      "page_function_invocations": 24067,
+      "middleware_invocations": 24406,
+      "cdn_requests": 24919
+    },
+    {
+      "date": "2026-10-18",
+      "origin_out_bytes": 3530,
+      "origin_in_bytes": 10440,
+      "page_function_invocations": 0,
+      "middleware_invocations": 2,
+      "cdn_requests": 2
+    },
+    {
+      "date": "2026-10-19",
+      "origin_out_bytes": 262200747,
+      "origin_in_bytes": 82795720,
+      "page_function_invocations": 9949,
+      "middleware_invocations": 10027,
+      "cdn_requests": 10103
+    },
+    {
+      "date": "2026-10-20",
+      "origin_out_bytes": 2349264128,
+      "origin_in_bytes": 381975415,
+      "page_function_invocations": 47595,
+      "middleware_invocations": 47625,
+      "cdn_requests": 47631
+    },
+    {
+      "date": "2026-10-21",
+      "origin_out_bytes": 2700370414,
+      "origin_in_bytes": 436997468,
+      "page_function_invocations": 54167,
+      "middleware_invocations": 54344,
+      "cdn_requests": 54509
+    },
+    {
+      "date": "2026-10-22",
+      "origin_out_bytes": 202769102,
+      "origin_in_bytes": 119633276,
+      "page_function_invocations": 14371,
+      "middleware_invocations": 14378,
+      "cdn_requests": 14386
+    },
+    {
+      "date": "2026-10-23",
+      "origin_out_bytes": 155436540,
+      "origin_in_bytes": 81986134,
+      "page_function_invocations": 9809,
+      "middleware_invocations": 9836,
+      "cdn_requests": 9839
+    },
+    {
+      "date": "2026-10-24",
+      "origin_out_bytes": 0,
+      "origin_in_bytes": 0,
+      "page_function_invocations": 0,
+      "middleware_invocations": 0,
+      "cdn_requests": 0
+    },
+    {
+      "date": "2026-10-25",
+      "origin_out_bytes": 0,
+      "origin_in_bytes": 0,
+      "page_function_invocations": 0,
+      "middleware_invocations": 0,
+      "cdn_requests": 0
+    },
+    {
+      "date": "2026-10-26",
+      "origin_out_bytes": 0,
+      "origin_in_bytes": 0,
+      "page_function_invocations": 0,
+      "middleware_invocations": 0,
+      "cdn_requests": 0
+    },
+    {
+      "date": "2026-10-27",
+      "origin_out_bytes": 0,
+      "origin_in_bytes": 0,
+      "page_function_invocations": 0,
+      "middleware_invocations": 0,
+      "cdn_requests": 0
+    },
+    {
+      "date": "2026-10-28",
+      "origin_out_bytes": 0,
+      "origin_in_bytes": 0,
+      "page_function_invocations": 0,
+      "middleware_invocations": 0,
+      "cdn_requests": 0
+    },
+    {
+      "date": "2026-10-29",
+      "origin_out_bytes": 126060249,
+      "origin_in_bytes": 21152492,
+      "page_function_invocations": 2549,
+      "middleware_invocations": 2631,
+      "cdn_requests": 2704
+    },
+    {
+      "date": "2026-10-30",
+      "origin_out_bytes": 4505455325,
+      "origin_in_bytes": 706842041,
+      "page_function_invocations": 88005,
+      "middleware_invocations": 88023,
+      "cdn_requests": 88024
+    },
+    {
+      "date": "2026-10-31",
+      "origin_out_bytes": 1335798132,
+      "origin_in_bytes": 212915015,
+      "page_function_invocations": 26467,
+      "middleware_invocations": 26520,
+      "cdn_requests": 26587
+    },
+    {
+      "date": "2026-11-01",
+      "origin_out_bytes": 4425403356,
+      "origin_in_bytes": 693271148,
+      "page_function_invocations": 86405,
+      "middleware_invocations": 86411,
+      "cdn_requests": 86387
+    },
+    {
+      "date": "2026-11-02",
+      "origin_out_bytes": 1463281730,
+      "origin_in_bytes": 229131400,
+      "page_function_invocations": 28570,
+      "middleware_invocations": 28570,
+      "cdn_requests": 28565
+    },
+    {
+      "date": "2026-11-03",
+      "origin_out_bytes": 1476017405,
+      "origin_in_bytes": 244093746,
+      "page_function_invocations": 30046,
+      "middleware_invocations": 30145,
+      "cdn_requests": 30159
+    },
+    {
+      "date": "2026-11-04",
+      "origin_out_bytes": 4865047450,
+      "origin_in_bytes": 717223756,
+      "page_function_invocations": 89273,
+      "middleware_invocations": 89336,
+      "cdn_requests": 89316
+    },
+    {
+      "date": "2026-11-05",
+      "origin_out_bytes": 5331274405,
+      "origin_in_bytes": 749793153,
+      "page_function_invocations": 92310,
+      "middleware_invocations": 92562,
+      "cdn_requests": 92637
+    },
+    {
+      "date": "2026-11-06",
+      "origin_out_bytes": 3939028648,
+      "origin_in_bytes": 532501875,
+      "page_function_invocations": 66179,
+      "middleware_invocations": 66292,
+      "cdn_requests": 66344
+    }
+  ],
+  "request_sample": {
+    "source": "POST https://api.vercel.com/v1/observability/events; event vercel.proxy_response",
+    "requested_time_range": {
+      "start": "2026-11-06T18:36:54.242+00:00",
+      "end": "2026-11-06T18:46:54.242+00:00"
+    },
+    "pagination_has_more": false,
+    "total_requests": 688,
+    "routes": {
+      "/dashboard/notes.rsc": 680,
+      "/i/v0/e": 7,
+      "/dashboard/notes": 1
+    },
+    "statuses": {
+      "200": 688
+    },
+    "cache_results": {
+      "MISS": 688
+    },
+    "notes_rsc_first_timestamp": "2026-11-06T18:36:55.059Z",
+    "notes_rsc_last_timestamp": "2026-11-06T18:46:41.041Z",
+    "notes_rsc_median_gap_seconds": 0.999,
+    "notes_rsc_requests": 680,
+    "first_10_notes_requests": [
+      {
+        "timestamp": "2026-11-06T18:36:55.059Z",
+        "route": "/dashboard/notes.rsc",
+        "cache": "MISS",
+        "status": 200
+      },
+      {
+        "timestamp": "2026-11-06T18:36:56.040Z",
+        "route": "/dashboard/notes.rsc",
+        "cache": "MISS",
+        "status": 200
+      },
+      {
+        "timestamp": "2026-11-06T18:36:57.040Z",
+        "route": "/dashboard/notes.rsc",
+        "cache": "MISS",
+        "status": 200
+      },
+      {
+        "timestamp": "2026-11-06T18:36:58.040Z",
+        "route": "/dashboard/notes.rsc",
+        "cache": "MISS",
+        "status": 200
+      },
+      {
+        "timestamp": "2026-11-06T18:36:59.040Z",
+        "route": "/dashboard/notes.rsc",
+        "cache": "MISS",
+        "status": 200
+      },
+      {
+        "timestamp": "2026-11-06T18:37:00.044Z",
+        "route": "/dashboard/notes.rsc",
+        "cache": "MISS",
+        "status": 200
+      },
+      {
+        "timestamp": "2026-11-06T18:37:01.040Z",
+        "route": "/dashboard/notes.rsc",
+        "cache": "MISS",
+        "status": 200
+      },
+      {
+        "timestamp": "2026-11-06T18:37:02.040Z",
+        "route": "/dashboard/notes.rsc",
+        "cache": "MISS",
+        "status": 200
+      },
+      {
+        "timestamp": "2026-11-06T18:37:03.041Z",
+        "route": "/dashboard/notes.rsc",
+        "cache": "MISS",
+        "status": 200
+      },
+      {
+        "timestamp": "2026-11-06T18:37:04.044Z",
+        "route": "/dashboard/notes.rsc",
+        "cache": "MISS",
+        "status": 200
+      }
+    ]
+  },
+  "limitations": [
+    "Daily totals are project-wide, not per-route bytes.",
+    "The ten-minute request sample establishes current polling; it does not attribute every historical byte.",
+    "No app behavior was changed and no production fix was deployed."
+  ],
+  "production_state": {
+    "deployment_id": "dpl_6XLuM4M6jHYVThBAwSmdY6pdd4uz",
+    "deployed_commit": "197ff30706e0243a4f4e001104e1306a09969c94",
+    "existing_timer_removal_commit": "0e9dee424032d95669f553d78b6a405b2dd6cd94",
+    "timer_removal_is_deployed": false,
+    "source": "GET /v9/projects/{projectId}; targets.production, checked during the investigation"
+  }
+}
