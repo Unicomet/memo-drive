@@ -26,11 +26,9 @@ export default function RootLayout({
       if (document.visibilityState === "visible") router.refresh();
     }
 
-    const interval = window.setInterval(refresh, 1000);
     window.addEventListener("focus", refresh);
     document.addEventListener("visibilitychange", refresh);
     return () => {
-      window.clearInterval(interval);
       window.removeEventListener("focus", refresh);
       document.removeEventListener("visibilitychange", refresh);
     };
